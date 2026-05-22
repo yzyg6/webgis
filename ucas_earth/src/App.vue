@@ -347,13 +347,11 @@ const handleSaveProperties = (newProps: Record<string, unknown>): void => {
 };
 
 const handleSelectEntity = (info: { layerId: string; featureIndex: number; properties: Record<string, unknown>; x: number; y: number }): void => {
-	console.log('[App] handleSelectEntity called:', info);
 	if (!info.layerId) {
 		buildingPopupInfo.value = null;
 		return;
 	}
 	buildingPopupInfo.value = info;
-	console.log('[App] buildingPopupInfo set:', buildingPopupInfo.value);
 };
 
 const handleShowBuildingDetail = (): void => {

@@ -482,14 +482,8 @@ watch(
 );
 
 const findLayerIdForEntity = (entity: Cesium.Entity): { layerId: string; dataSource: Cesium.GeoJsonDataSource } | null => {
-	console.log('[findLayerIdForEntity] Searching for entity:', entity);
-	console.log('[findLayerIdForEntity] cityModelDataSources size:', cityModelDataSources.size);
 	for (const [layerId, dataSource] of cityModelDataSources.entries()) {
-		console.log('[findLayerIdForEntity] Checking layerId:', layerId);
-		console.log('[findLayerIdForEntity] dataSource.entities.values count:', dataSource.entities.values.length);
-		const contains = dataSource.entities.contains(entity);
-		console.log('[findLayerIdForEntity] dataSource.entities.contains(entity):', contains);
-		if (contains) {
+		if (dataSource.entities.contains(entity)) {
 			return { layerId, dataSource };
 		}
 	}
@@ -514,7 +508,8 @@ const setupMouseHandlers = (): void => {
 	hoverHandler.setInputAction((movement: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
 		const picked = viewer.scene.pick(movement.endPosition);
 		if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
-			const entity = picked.id as Cesium.Entity;
+			// Use toRaw() to remove Vue proxy wrapper from picked entity
+			const entity = toRaw(picked.id as Cesium.Entity);
 			const result = findLayerIdForEntity(entity);
 			if (result) {
 				const featureIndex = findFeatureIndex(entity, result.dataSource);
@@ -542,7 +537,8 @@ const setupMouseHandlers = (): void => {
 		}
 		const picked = viewer.scene.pick(click.position);
 		if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
-			const entity = picked.id as Cesium.Entity;
+			// Use toRaw() to remove Vue proxy wrapper from picked entity
+			const entity = toRaw(picked.id as Cesium.Entity);
 			const result = findLayerIdForEntity(entity);
 			if (result) {
 				const featureIndex = findFeatureIndex(entity, result.dataSource);
@@ -566,22 +562,12 @@ const setupMouseHandlers = (): void => {
 		clickTimer = window.setTimeout(() => {
 			clickTimer = null;
 			const picked = viewer.scene.pick(new Cesium.Cartesian2(posX, posY));
-			console.log('[Click] picked:', picked);
-			console.log('[Click] defined(picked):', Cesium.defined(picked));
-			if (Cesium.defined(picked)) {
-				console.log('[Click] picked.id:', picked.id);
-				console.log('[Click] defined(picked.id):', Cesium.defined(picked.id));
-				console.log('[Click] picked.id instanceof Cesium.Entity:', picked.id instanceof Cesium.Entity);
-			}
 			if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
-				const entity = picked.id as Cesium.Entity;
-				console.log('[Click] Entity found:', entity);
-				console.log('[Click] Entity properties:', entity.properties);
+				// Use toRaw() to remove Vue proxy wrapper from picked entity
+				const entity = toRaw(picked.id as Cesium.Entity);
 				const result = findLayerIdForEntity(entity);
-				console.log('[Click] findLayerIdForEntity result:', result);
 				if (result) {
 					const featureIndex = findFeatureIndex(entity, result.dataSource);
-					console.log('[Click] featureIndex:', featureIndex);
 					highlightEntity(entity);
 					emit("selectEntity", {
 						layerId: result.layerId,
