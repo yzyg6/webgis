@@ -319,6 +319,7 @@ const handleHoverEntity = (info: HoverInfo | null): void => {
 };
 
 const handleEditEntity = (info: EditInfo): void => {
+	buildingPopupInfo.value = null;
 	editingEntity.value = info;
 };
 
