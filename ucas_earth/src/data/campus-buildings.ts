@@ -93,10 +93,12 @@ export const getAllBuildingMetas = (): BuildingMeta[] => {
 
 export const searchBuildingMetas = (query: string): BuildingMeta[] => {
   const lowerQuery = query.toLowerCase();
+  if (!lowerQuery.trim()) return [];
   return getAllBuildingMetas().filter((meta) =>
     meta.name.toLowerCase().includes(lowerQuery) ||
     meta.purpose.toLowerCase().includes(lowerQuery) ||
-    meta.college.toLowerCase().includes(lowerQuery)
+    meta.college.toLowerCase().includes(lowerQuery) ||
+    meta.description?.toLowerCase().includes(lowerQuery)
   );
 };
 
