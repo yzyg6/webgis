@@ -1,0 +1,105 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "测试建筑1",
+        "Height": 30,
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.778, 32.886],
+            [115.779, 32.886],
+            [115.779, 32.887],
+            [115.778, 32.887],
+            [115.778, 32.886]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "测试建筑2",
+        "Height": 50,
+        "building:levels": 10
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.780, 32.886],
+            [115.781, 32.886],
+            [115.781, 32.887],
+            [115.780, 32.887],
+            [115.780, 32.886]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "测试道路",
+        "highway": "residential",
+        "width": 8
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.782, 32.886],
+            [115.783, 32.886],
+            [115.783, 32.8865],
+            [115.782, 32.8865],
+            [115.782, 32.886]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "测试水域",
+        "water": "lake",
+        "natural": "water"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.784, 32.886],
+            [115.785, 32.886],
+            [115.785, 32.887],
+            [115.784, 32.887],
+            [115.784, 32.886]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "测试绿地",
+        "landuse": "grass",
+        "leisure": "park"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.786, 32.886],
+            [115.787, 32.886],
+            [115.787, 32.887],
+            [115.786, 32.887],
+            [115.786, 32.886]
+          ]
+        ]
+      }
+    }
+  ]
+}
