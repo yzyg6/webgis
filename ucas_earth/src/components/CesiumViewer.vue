@@ -345,7 +345,13 @@ const performSyncCityModelLayers = async (): Promise<void> => {
 		return;
 	}
 
-	const expectedIds = new Set(props.cityLayers.map((layer) => layer.id));
+	// Convert reactive array to plain array to avoid Vue proxy issues with Cesium workers
+	const plainCityLayers = toRaw(props.cityLayers).map(layer => ({
+		...toRaw(layer),
+		geojson: JSON.parse(JSON.stringify(toRaw(layer.geojson)))
+	}));
+
+	const expectedIds = new Set(plainCityLayers.map((layer) => layer.id));
 	for (const [layerId, dataSource] of cityModelDataSources.entries()) {
 		if (!expectedIds.has(layerId)) {
 			cesiumViewer.value.dataSources.remove(dataSource, true);
@@ -354,12 +360,12 @@ const performSyncCityModelLayers = async (): Promise<void> => {
 		}
 	}
 
-	for (const layer of props.cityLayers) {
+	for (const layer of plainCityLayers) {
 		if (cesiumViewer.value.isDestroyed()) {
 			return;
 		}
 
-		const layerSignature = JSON.stringify(toRaw(layer.geojson));
+		const layerSignature = JSON.stringify(layer.geojson);
 		let dataSource = cityModelDataSources.get(layer.id);
 		const existingSignature = cityLayerSignatures.get(layer.id);
 
@@ -375,20 +381,19 @@ const performSyncCityModelLayers = async (): Promise<void> => {
 
 		if (!dataSource) {
 			try {
-				// Deep clone to remove Vue reactivity wrappers that Cesium workers cannot serialize
-				const rawGeoJson = JSON.parse(JSON.stringify(toRaw(layer.geojson)));
-				const loadedDataSource = await Cesium.GeoJsonDataSource.load(rawGeoJson, {
+				// layer.geojson is already a plain object from the pre-processing above
+				const loadedDataSource = await Cesium.GeoJsonDataSource.load(layer.geojson, {
 				});
 				const viewer = cesiumViewer.value;
 
-				if (!viewer || viewer.isDestroyed() || !props.cityLayers.some((item) => item.id === layer.id)) {
+				if (!viewer || viewer.isDestroyed() || !plainCityLayers.some((item) => item.id === layer.id)) {
 					continue;
 				}
 
 				applyFeatureExtrusion(loadedDataSource);
 				await viewer.dataSources.add(loadedDataSource);
 
-				if (viewer.isDestroyed() || !props.cityLayers.some((item) => item.id === layer.id)) {
+				if (viewer.isDestroyed() || !plainCityLayers.some((item) => item.id === layer.id)) {
 					if (!viewer.isDestroyed()) {
 						viewer.dataSources.remove(loadedDataSource, true);
 					}
