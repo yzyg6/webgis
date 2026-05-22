@@ -476,18 +476,18 @@ watch(
 	{ deep: true }
 );
 
-const findLayerIdForEntity = (entity: Cesium.Entity): string | null => {
+const findLayerIdForEntity = (entity: Cesium.Entity): { layerId: string; dataSource: Cesium.GeoJsonDataSource } | null => {
 	for (const [layerId, dataSource] of cityModelDataSources.entries()) {
 		if (dataSource.entities.contains(entity)) {
-			return layerId;
+			return { layerId, dataSource };
 		}
 	}
 	return null;
 };
 
-const parseFeatureIndex = (entityId: string): number => {
-	const match = entityId.match(/geojson_feature_(\d+)/);
-	return match ? Number.parseInt(match[1] ?? '0', 10) : -1;
+const findFeatureIndex = (entity: Cesium.Entity, dataSource: Cesium.GeoJsonDataSource): number => {
+	const entities = dataSource.entities.values;
+	return entities.indexOf(entity);
 };
 
 const getEntityProperties = (entity: Cesium.Entity): Record<string, unknown> => {
@@ -504,12 +504,12 @@ const setupMouseHandlers = (): void => {
 		const picked = viewer.scene.pick(movement.endPosition);
 		if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
 			const entity = picked.id as Cesium.Entity;
-			const layerId = findLayerIdForEntity(entity);
-			if (layerId) {
-				const featureIndex = parseFeatureIndex(entity.id ?? '');
+			const result = findLayerIdForEntity(entity);
+			if (result) {
+				const featureIndex = findFeatureIndex(entity, result.dataSource);
 				highlightEntity(entity);
 				emit("hoverEntity", {
-					layerId,
+					layerId: result.layerId,
 					featureIndex,
 					properties: getEntityProperties(entity),
 					x: movement.endPosition.x,
@@ -532,11 +532,11 @@ const setupMouseHandlers = (): void => {
 		const picked = viewer.scene.pick(click.position);
 		if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
 			const entity = picked.id as Cesium.Entity;
-			const layerId = findLayerIdForEntity(entity);
-			if (layerId) {
-				const featureIndex = parseFeatureIndex(entity.id ?? '');
+			const result = findLayerIdForEntity(entity);
+			if (result) {
+				const featureIndex = findFeatureIndex(entity, result.dataSource);
 				emit("editEntity", {
-					layerId,
+					layerId: result.layerId,
 					featureIndex,
 					properties: getEntityProperties(entity),
 				});
@@ -557,12 +557,12 @@ const setupMouseHandlers = (): void => {
 			const picked = viewer.scene.pick(new Cesium.Cartesian2(posX, posY));
 			if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
 				const entity = picked.id as Cesium.Entity;
-				const layerId = findLayerIdForEntity(entity);
-				if (layerId) {
-					const featureIndex = parseFeatureIndex(entity.id ?? '');
+				const result = findLayerIdForEntity(entity);
+				if (result) {
+					const featureIndex = findFeatureIndex(entity, result.dataSource);
 					highlightEntity(entity);
 					emit("selectEntity", {
-						layerId,
+						layerId: result.layerId,
 						featureIndex,
 						properties: getEntityProperties(entity),
 						x: posX,
