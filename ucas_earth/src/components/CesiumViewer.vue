@@ -550,10 +550,11 @@ const setupMouseHandlers = (): void => {
 		if (clickTimer !== null) {
 			clearTimeout(clickTimer);
 		}
-		const position = { x: click.position.x, y: click.position.y };
+		const posX = click.position.x;
+		const posY = click.position.y;
 		clickTimer = window.setTimeout(() => {
 			clickTimer = null;
-			const picked = viewer.scene.pick(position);
+			const picked = viewer.scene.pick(new Cesium.Cartesian2(posX, posY));
 			if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
 				const entity = picked.id as Cesium.Entity;
 				const layerId = findLayerIdForEntity(entity);
@@ -564,8 +565,8 @@ const setupMouseHandlers = (): void => {
 						layerId,
 						featureIndex,
 						properties: getEntityProperties(entity),
-						x: position.x,
-						y: position.y,
+						x: posX,
+						y: posY,
 					});
 					return;
 				}
