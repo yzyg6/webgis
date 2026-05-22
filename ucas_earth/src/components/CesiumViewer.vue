@@ -482,8 +482,14 @@ watch(
 );
 
 const findLayerIdForEntity = (entity: Cesium.Entity): { layerId: string; dataSource: Cesium.GeoJsonDataSource } | null => {
+	console.log('[findLayerIdForEntity] Searching for entity:', entity);
+	console.log('[findLayerIdForEntity] cityModelDataSources size:', cityModelDataSources.size);
 	for (const [layerId, dataSource] of cityModelDataSources.entries()) {
-		if (dataSource.entities.contains(entity)) {
+		console.log('[findLayerIdForEntity] Checking layerId:', layerId);
+		console.log('[findLayerIdForEntity] dataSource.entities.values count:', dataSource.entities.values.length);
+		const contains = dataSource.entities.contains(entity);
+		console.log('[findLayerIdForEntity] dataSource.entities.contains(entity):', contains);
+		if (contains) {
 			return { layerId, dataSource };
 		}
 	}
@@ -560,11 +566,22 @@ const setupMouseHandlers = (): void => {
 		clickTimer = window.setTimeout(() => {
 			clickTimer = null;
 			const picked = viewer.scene.pick(new Cesium.Cartesian2(posX, posY));
+			console.log('[Click] picked:', picked);
+			console.log('[Click] defined(picked):', Cesium.defined(picked));
+			if (Cesium.defined(picked)) {
+				console.log('[Click] picked.id:', picked.id);
+				console.log('[Click] defined(picked.id):', Cesium.defined(picked.id));
+				console.log('[Click] picked.id instanceof Cesium.Entity:', picked.id instanceof Cesium.Entity);
+			}
 			if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
 				const entity = picked.id as Cesium.Entity;
+				console.log('[Click] Entity found:', entity);
+				console.log('[Click] Entity properties:', entity.properties);
 				const result = findLayerIdForEntity(entity);
+				console.log('[Click] findLayerIdForEntity result:', result);
 				if (result) {
 					const featureIndex = findFeatureIndex(entity, result.dataSource);
+					console.log('[Click] featureIndex:', featureIndex);
 					highlightEntity(entity);
 					emit("selectEntity", {
 						layerId: result.layerId,
@@ -592,19 +609,18 @@ onMounted(async () => {
 	cesiumViewer.value = new Cesium.Viewer("cesium_container", {
 		baseLayer: false,
 		terrainProvider: new Cesium.EllipsoidTerrainProvider(),
-			// Enable all built-in Cesium widgets requested by the tutorial UI.
-			baseLayerPicker: true,
-			geocoder: false,
-			homeButton: true,
-			sceneModePicker: true,
-			navigationHelpButton: true,
-			animation: true,
-			timeline: true,
-			fullscreenButton: true,
-			selectionIndicator: true,
-			infoBox: true,
-			vrButton: true,
-			navigationInstructionsInitiallyVisible: true,
+		baseLayerPicker: true,
+		geocoder: false,
+		homeButton: true,
+		sceneModePicker: true,
+		navigationHelpButton: true,
+		animation: true,
+		timeline: true,
+		fullscreenButton: true,
+		selectionIndicator: false,
+		infoBox: false,
+		vrButton: true,
+		navigationInstructionsInitiallyVisible: true,
 	});
 
 	applyBaseLayer(props.baseLayer);
