@@ -51,7 +51,7 @@ let clickTimer: number | null = null;
 
 // Highlight state
 let highlightedEntity: Cesium.Entity | null = null;
-const originalStyles = new Map<Cesium.Entity, {
+const originalStyles = new Map<string, {
 	material: Cesium.MaterialProperty | undefined;
 	outlineColor: Cesium.Property | undefined;
 	outlineWidth: Cesium.Property | undefined;
@@ -294,7 +294,7 @@ const HIGHLIGHT_COLOR = Cesium.Color.fromCssColorString("#ffcc00").withAlpha(0.9
 const HIGHLIGHT_OUTLINE_COLOR = Cesium.Color.fromCssColorString("#ffffff").withAlpha(1.0);
 
 const highlightEntity = (entity: Cesium.Entity): void => {
-	if (highlightedEntity === entity) return;
+	if (highlightedEntity?.id === entity.id) return;
 
 	// Restore previous highlight
 	restoreHighlight();
@@ -302,8 +302,8 @@ const highlightEntity = (entity: Cesium.Entity): void => {
 	const polygon = (entity as EntityWithPolygon).polygon;
 	if (!polygon) return;
 
-	// Save original styles
-	originalStyles.set(entity, {
+	// Save original styles using entity ID as key
+	originalStyles.set(entity.id, {
 		material: polygon.material,
 		outlineColor: polygon.outlineColor,
 		outlineWidth: polygon.outlineWidth,
@@ -320,7 +320,7 @@ const highlightEntity = (entity: Cesium.Entity): void => {
 const restoreHighlight = (): void => {
 	if (!highlightedEntity) return;
 
-	const styles = originalStyles.get(highlightedEntity);
+	const styles = originalStyles.get(highlightedEntity.id);
 	if (styles) {
 		const polygon = (highlightedEntity as EntityWithPolygon).polygon;
 		if (polygon) {
@@ -334,7 +334,7 @@ const restoreHighlight = (): void => {
 				polygon.outlineWidth = styles.outlineWidth;
 			}
 		}
-		originalStyles.delete(highlightedEntity);
+		originalStyles.delete(highlightedEntity.id);
 	}
 
 	highlightedEntity = null;
@@ -482,8 +482,11 @@ watch(
 );
 
 const findLayerIdForEntity = (entity: Cesium.Entity): { layerId: string; dataSource: Cesium.GeoJsonDataSource } | null => {
+	// Use entity ID for lookup instead of contains() which fails with Vue proxies
+	const entityId = entity.id;
 	for (const [layerId, dataSource] of cityModelDataSources.entries()) {
-		if (dataSource.entities.contains(entity)) {
+		const found = dataSource.entities.getById(entityId);
+		if (found) {
 			return { layerId, dataSource };
 		}
 	}
@@ -491,8 +494,15 @@ const findLayerIdForEntity = (entity: Cesium.Entity): { layerId: string; dataSou
 };
 
 const findFeatureIndex = (entity: Cesium.Entity, dataSource: Cesium.GeoJsonDataSource): number => {
+	// Use entity ID for lookup instead of indexOf() which fails with Vue proxies
+	const entityId = entity.id;
 	const entities = dataSource.entities.values;
-	return entities.indexOf(entity);
+	for (let i = 0; i < entities.length; i++) {
+		if (entities[i]?.id === entityId) {
+			return i;
+		}
+	}
+	return -1;
 };
 
 const getEntityProperties = (entity: Cesium.Entity): Record<string, unknown> => {
