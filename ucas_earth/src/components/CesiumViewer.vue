@@ -37,6 +37,7 @@ const props = defineProps<{
 const emit = defineEmits<{
 	hoverEntity: [info: EntityHoverInfo | null];
 	editEntity: [info: { layerId: string; featureIndex: number; properties: Record<string, unknown> }];
+	selectEntity: [info: { layerId: string; featureIndex: number; properties: Record<string, unknown>; x: number; y: number }];
 }>();
 
 const cesiumViewer = ref<Cesium.Viewer | null>(null);
@@ -45,6 +46,8 @@ const cityLayerSignatures = new Map<string, string>();
 let cityLayerSyncQueue: Promise<void> = Promise.resolve();
 let hoverHandler: Cesium.ScreenSpaceEventHandler | null = null;
 let dblClickHandler: Cesium.ScreenSpaceEventHandler | null = null;
+let clickHandler: Cesium.ScreenSpaceEventHandler | null = null;
+let clickTimer: number | null = null;
 
 // Highlight state
 let highlightedEntity: Cesium.Entity | null = null;
@@ -414,6 +417,50 @@ const syncCityModelLayers = async (): Promise<void> => {
 	return nextSync;
 };
 
+const flyToEntity = (entity: Cesium.Entity): void => {
+	const viewer = cesiumViewer.value;
+	if (!viewer || viewer.isDestroyed()) return;
+
+	const polygon = (entity as EntityWithPolygon).polygon;
+	if (!polygon) return;
+
+	const positions = polygon.hierarchy?.getValue(Cesium.JulianDate.now())?.positions;
+	if (!positions || positions.length === 0) return;
+
+	const boundingSphere = Cesium.BoundingSphere.fromPoints(positions);
+	const offset = new Cesium.HeadingPitchRange(
+		DEFAULT_CENTER.heading,
+		DEFAULT_CENTER.pitch,
+		boundingSphere.radius * 3
+	);
+
+	viewer.camera.flyToBoundingSphere(boundingSphere, {
+		duration: 1.2,
+		offset,
+	});
+
+	highlightEntity(entity);
+};
+
+const flyToBuildingByName = (name: string): boolean => {
+	for (const [, dataSource] of cityModelDataSources.entries()) {
+		for (const entity of dataSource.entities.values) {
+			const properties = entity.properties;
+			if (!properties) continue;
+			const values = properties.getValue(Cesium.JulianDate.now()) as Record<string, unknown> | undefined;
+			if (!values) continue;
+			const entityName = values.name || values.Name;
+			if (entityName === name) {
+				flyToEntity(entity);
+				return true;
+			}
+		}
+	}
+	return false;
+};
+
+defineExpose({ flyToBuildingByName });
+
 watch(
 	() => props.baseLayer,
 	(layerType) => {
@@ -477,6 +524,11 @@ const setupMouseHandlers = (): void => {
 
 	dblClickHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 	dblClickHandler.setInputAction((click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
+		// 双击时取消待执行的单击
+		if (clickTimer !== null) {
+			clearTimeout(clickTimer);
+			clickTimer = null;
+		}
 		const picked = viewer.scene.pick(click.position);
 		if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
 			const entity = picked.id as Cesium.Entity;
@@ -491,6 +543,43 @@ const setupMouseHandlers = (): void => {
 			}
 		}
 	}, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
+	// 单击建筑 → 延迟 300ms 后弹出摘要气泡（双击会在此期间取消）
+	clickHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+	clickHandler.setInputAction((click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
+		if (clickTimer !== null) {
+			clearTimeout(clickTimer);
+		}
+		const position = { x: click.position.x, y: click.position.y };
+		clickTimer = window.setTimeout(() => {
+			clickTimer = null;
+			const picked = viewer.scene.pick(position);
+			if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
+				const entity = picked.id as Cesium.Entity;
+				const layerId = findLayerIdForEntity(entity);
+				if (layerId) {
+					const featureIndex = parseFeatureIndex(entity.id ?? '');
+					highlightEntity(entity);
+					emit("selectEntity", {
+						layerId,
+						featureIndex,
+						properties: getEntityProperties(entity),
+						x: position.x,
+						y: position.y,
+					});
+					return;
+				}
+			}
+			restoreHighlight();
+			emit("selectEntity", {
+				layerId: '',
+				featureIndex: -1,
+				properties: {},
+				x: 0,
+				y: 0,
+			});
+		}, 300);
+	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 };
 
 onMounted(async () => {
@@ -537,6 +626,14 @@ onUnmounted(() => {
 	if (dblClickHandler) {
 		dblClickHandler.destroy();
 		dblClickHandler = null;
+	}
+	if (clickHandler) {
+		clickHandler.destroy();
+		clickHandler = null;
+	}
+	if (clickTimer !== null) {
+		clearTimeout(clickTimer);
+		clickTimer = null;
 	}
 	if (cesiumViewer.value) {
 		for (const dataSource of cityModelDataSources.values()) {
