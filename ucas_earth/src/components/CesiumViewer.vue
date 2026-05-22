@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, toRaw, watch } from "vue";
+import { markRaw, onMounted, onUnmounted, ref, toRaw, watch } from "vue";
 import * as Cesium from "cesium";
 
 type BaseLayerType = "osm" | "arcgis" | "carto";
@@ -602,7 +602,7 @@ const setupMouseHandlers = (): void => {
 };
 
 onMounted(async () => {
-	cesiumViewer.value = new Cesium.Viewer("cesium_container", {
+	cesiumViewer.value = markRaw(new Cesium.Viewer("cesium_container", {
 		baseLayer: false,
 		terrainProvider: new Cesium.EllipsoidTerrainProvider(),
 		baseLayerPicker: true,
@@ -617,7 +617,7 @@ onMounted(async () => {
 		infoBox: false,
 		vrButton: true,
 		navigationInstructionsInitiallyVisible: true,
-	});
+	}));
 
 	applyBaseLayer(props.baseLayer);
 	applyDefaultView(0);

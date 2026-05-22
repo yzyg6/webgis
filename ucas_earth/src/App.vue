@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, markRaw, onMounted, onUnmounted, ref, watch } from "vue";
 import Header from "./components/Header.vue";
 import CesiumViewer from "./components/CesiumViewer.vue";
 import LayerPanel from "./components/LayerPanel.vue";
@@ -250,7 +250,7 @@ const handleLoadCityModelFile = async (file: File): Promise<void> => {
 			id: `city-layer-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
 			name: layerName,
 			visible: true,
-			geojson: normalized,
+			geojson: markRaw(normalized),
 		});
 
 		// Fire-and-forget: save to database
@@ -302,7 +302,7 @@ const handleLoadDbLayer = async (layerId: string): Promise<void> => {
 			id: `city-layer-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
 			name: layerName,
 			visible: true,
-			geojson: normalized,
+			geojson: markRaw(normalized),
 		});
 	} catch (err) {
 		console.warn("Failed to load layer from database:", err);
@@ -337,7 +337,7 @@ const handleSaveProperties = (newProps: Record<string, unknown>): void => {
 	if (fc.features && fc.features[editingInfo.featureIndex]) {
 		fc.features[editingInfo.featureIndex]!.properties = newProps;
 	}
-	layer.geojson = { ...layer.geojson };
+	layer.geojson = markRaw({ ...layer.geojson });
 
 	dbUpdateLayer(layer.name, layer.geojson).catch((err) => {
 		console.warn("Failed to sync to database:", err);
@@ -389,7 +389,7 @@ onMounted(() => {
 				.filter((item) => item && typeof item.id === "string" && typeof item.name === "string")
 				.map((item) => ({
 					...item,
-					geojson: normalizeGeoJson(item.geojson) ?? normalizeGeoJsonArray(item.geojson) ?? item.geojson,
+					geojson: markRaw(normalizeGeoJson(item.geojson) ?? normalizeGeoJsonArray(item.geojson) ?? item.geojson),
 				}));
 		}
 	} catch {
