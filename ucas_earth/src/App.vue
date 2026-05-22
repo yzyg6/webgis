@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import Header from "./components/Header.vue";
 import CesiumViewer from "./components/CesiumViewer.vue";
 import LayerPanel from "./components/LayerPanel.vue";
 import PropertyTable from "./components/PropertyTable.vue";
 import HoverTooltip from "./components/HoverTooltip.vue";
 import EditPanel from "./components/EditPanel.vue";
+import BuildingPopup from "./components/BuildingPopup.vue";
+import BuildingInfoPanel from "./components/BuildingInfoPanel.vue";
 import { createLayer as dbCreateLayer, listLayers as dbListLayers, getLayer as dbGetLayer, updateLayer as dbUpdateLayer } from "./api/geojson-db";
 import type { GeoJsonLayerMeta } from "./types/geojson-db";
+import { getBuildingMeta, getAllBuildingMetas } from "./data/campus-buildings";
+import type { BuildingMeta } from "./data/campus-buildings";
 
 type BaseLayerType = "osm" | "arcgis" | "carto";
 type GeoJsonObject = Record<string, unknown>;
@@ -36,6 +40,16 @@ type EditInfo = { layerId: string; featureIndex: number; properties: Record<stri
 
 const hoveredEntity = ref<HoverInfo | null>(null);
 const editingEntity = ref<EditInfo | null>(null);
+
+const selectedBuilding = ref<BuildingMeta | null>(null);
+const buildingPopupInfo = ref<{
+	layerId: string; featureIndex: number;
+	properties: Record<string, unknown>; x: number; y: number;
+} | null>(null);
+const buildingSearchQuery = ref('');
+const buildingPanelCollapsed = ref(false);
+const allBuildings = getAllBuildingMetas();
+const cesiumViewerRef = ref<InstanceType<typeof CesiumViewer> | null>(null);
 
 const layerMetaList = computed(() =>
 	cityLayers.value.map((layer) => {
@@ -332,7 +346,37 @@ const handleSaveProperties = (newProps: Record<string, unknown>): void => {
 	editingEntity.value = null;
 };
 
+const handleSelectEntity = (info: { layerId: string; featureIndex: number; properties: Record<string, unknown>; x: number; y: number }): void => {
+	if (!info.layerId) {
+		buildingPopupInfo.value = null;
+		return;
+	}
+	buildingPopupInfo.value = info;
+};
+
+const handleShowBuildingDetail = (): void => {
+	if (!buildingPopupInfo.value) return;
+	const name = String(buildingPopupInfo.value.properties.name || buildingPopupInfo.value.properties.Name || '');
+	const meta = getBuildingMeta(name);
+	if (meta) {
+		selectedBuilding.value = meta;
+	}
+	buildingPopupInfo.value = null;
+};
+
+const handleSelectBuildingFromPanel = (meta: BuildingMeta): void => {
+	selectedBuilding.value = meta;
+	cesiumViewerRef.value?.flyToBuildingByName(meta.name);
+};
+
+const handleKeydown = (e: KeyboardEvent): void => {
+	if (e.key === 'Escape' && buildingPopupInfo.value) {
+		buildingPopupInfo.value = null;
+	}
+};
+
 onMounted(() => {
+	window.addEventListener('keydown', handleKeydown);
 	const cached = localStorage.getItem(STORAGE_KEY);
 	if (!cached) {
 		return;
@@ -369,6 +413,10 @@ watch(
 	},
 	{ deep: true }
 );
+
+onUnmounted(() => {
+	window.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <template>
@@ -395,6 +443,16 @@ watch(
 					@select-layer="(id) => (selectedLayerId = id)"
 					@toggle-collapse="layerPanelCollapsed = !layerPanelCollapsed"
 				/>
+				<BuildingInfoPanel
+					:buildings="allBuildings"
+					:selected-building="selectedBuilding"
+					:search-query="buildingSearchQuery"
+					:geo-properties="buildingPopupInfo?.properties ?? {}"
+					:collapsed="buildingPanelCollapsed"
+					@select-building="handleSelectBuildingFromPanel"
+					@update:search-query="(q) => (buildingSearchQuery = q)"
+					@toggle-collapse="buildingPanelCollapsed = !buildingPanelCollapsed"
+				/>
 				<PropertyTable
 					:layer-name="selectedLayerName"
 					:properties="selectedLayerProperties"
@@ -403,12 +461,25 @@ watch(
 				/>
 			</div>
 			<CesiumViewer
+				ref="cesiumViewerRef"
 				:base-layer="currentBaseLayer"
 				:city-layers="cityLayers"
 				@hover-entity="handleHoverEntity"
 				@edit-entity="handleEditEntity"
+				@select-entity="handleSelectEntity"
 			/>
 		</main>
+		<BuildingPopup
+			:visible="buildingPopupInfo !== null"
+			:x="buildingPopupInfo?.x ?? 0"
+			:y="buildingPopupInfo?.y ?? 0"
+			:building-name="String(buildingPopupInfo?.properties?.name || buildingPopupInfo?.properties?.Name || '')"
+			:purpose="String(buildingPopupInfo?.properties?.building || buildingPopupInfo?.properties?.purpose || '')"
+			:floors="Number(buildingPopupInfo?.properties?.['building:levels'] || buildingPopupInfo?.properties?.floors || 0)"
+			:capacity="Number(buildingPopupInfo?.properties?.capacity || 0)"
+			@show-detail="handleShowBuildingDetail"
+			@close="buildingPopupInfo = null"
+		/>
 		<HoverTooltip
 			:visible="hoveredEntity !== null"
 			:x="hoveredEntity?.x ?? 0"
