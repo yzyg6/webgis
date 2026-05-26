@@ -296,7 +296,6 @@ const applyFeatureExtrusion = (dataSource: Cesium.GeoJsonDataSource): void => {
 		const properties = entity.properties;
 		const featureResult = getFeatureType(properties);
 		const featureType = featureResult.type;
-		const buildingType: BuildingType | undefined = featureResult.buildingType;
 		const style = FEATURE_STYLES[featureType];
 		const height = readFeatureHeight(properties, featureType);
 
