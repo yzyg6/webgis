@@ -14,6 +14,26 @@
         </div>
         <button class="popup-close" @click="emit('close')">✕</button>
       </div>
+      <div class="popup-height">
+        <div class="height-label">
+          <span class="height-text">高度</span>
+          <span class="height-value">{{ sliderHeight }}m</span>
+        </div>
+        <input
+          type="range"
+          class="height-slider"
+          :min="5"
+          :max="50"
+          :step="1"
+          v-model.number="sliderHeight"
+          @input="onHeightInput"
+          @change="onHeightChange"
+        />
+        <div class="height-range">
+          <span>5m</span>
+          <span>50m</span>
+        </div>
+      </div>
       <div class="popup-body">
         <div class="popup-courses-header">今日课程</div>
         <div v-if="courses.length === 0" class="popup-no-courses">暂无课程</div>
@@ -31,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { Course } from '../types/courses';
 import type { BuildingType } from '../types/building';
 import { BUILDING_TYPE_LABELS } from '../types/building';
@@ -43,12 +63,31 @@ const props = defineProps<{
   buildingName: string;
   buildingType?: BuildingType;
   courses: Course[];
+  currentHeight?: number;
 }>();
 
 const emit = defineEmits<{
   'show-detail': [];
   close: [];
+  'heightChange': [height: number];
+  'heightChangeEnd': [height: number];
 }>();
+
+const sliderHeight = ref(props.currentHeight ?? 12);
+
+watch(() => props.currentHeight, (val) => {
+  if (val !== undefined) {
+    sliderHeight.value = val;
+  }
+});
+
+const onHeightInput = (): void => {
+  emit('heightChange', sliderHeight.value);
+};
+
+const onHeightChange = (): void => {
+  emit('heightChangeEnd', sliderHeight.value);
+};
 
 const buildingTypeLabel = computed(() => {
   return props.buildingType ? BUILDING_TYPE_LABELS[props.buildingType] : '';
@@ -135,6 +174,59 @@ const popupY = computed(() => {
 
 .popup-close:hover {
   color: var(--text-close-hover);
+}
+
+.popup-height {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.height-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.height-text {
+  font-size: 11px;
+  color: var(--text-label);
+  font-weight: 500;
+}
+
+.height-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-accent);
+}
+
+.height-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.height-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-accent);
+  cursor: pointer;
+}
+
+.height-range {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
 }
 
 .popup-body {
