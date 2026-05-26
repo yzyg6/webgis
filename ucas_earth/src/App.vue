@@ -10,6 +10,12 @@ import { createLayer as dbCreateLayer, listLayers as dbListLayers, getLayer as d
 import type { GeoJsonLayerMeta } from "./types/geojson-db";
 import { getBuildingMeta, getAllBuildingMetas } from "./data/campus-buildings";
 import type { BuildingMeta } from "./data/campus-buildings";
+import { createCourse, listCourses, updateCourse, deleteCourse, importCourses } from "./api/courses";
+import type { Course, CourseCreateInput, CourseImportRow } from "./types/courses";
+import { getCurrentWeek, getCurrentDay } from "./utils/weekRange";
+import CourseForm from "./components/CourseForm.vue";
+import CourseImport from "./components/CourseImport.vue";
+import CourseDetail from "./components/CourseDetail.vue";
 
 type BaseLayerType = "osm" | "arcgis" | "carto";
 type GeoJsonObject = Record<string, unknown>;
@@ -45,6 +51,19 @@ const buildingPopupInfo = ref<{
 } | null>(null);
 const buildingSearchQuery = ref('');
 const allBuildings = getAllBuildingMetas();
+
+const courses = ref<Course[]>([]);
+const currentWeek = ref(getCurrentWeek());
+const currentDay = ref(getCurrentDay());
+const courseDetailInfo = ref<{
+	buildingName: string;
+	courses: Course[];
+	x: number;
+	y: number;
+} | null>(null);
+const editingCourse = ref<Course | null>(null);
+const showCourseForm = ref(false);
+const showCourseImport = ref(false);
 const cesiumViewerRef = ref<InstanceType<typeof CesiumViewer> | null>(null);
 
 const layerMetaList = computed(() =>
@@ -69,6 +88,23 @@ const selectedLayerProperties = computed(() => {
 	if (!layer) return [];
 	const fc = layer.geojson as { features?: { properties?: Record<string, unknown> }[] };
 	return (fc.features ?? []).map((f) => f.properties ?? {});
+});
+
+const courseBuildings = computed(() => {
+	const buildings = new Set(courses.value.map(c => c.buildingName));
+	return Array.from(buildings).sort();
+});
+
+const coursesByBuilding = computed(() => {
+	const map = new Map<string, Course[]>();
+	for (const course of courses.value) {
+		if (course.weekday === currentDay.value) {
+			const list = map.get(course.buildingName) || [];
+			list.push(course);
+			map.set(course.buildingName, list);
+		}
+	}
+	return map;
 });
 
 const handleSwitchLayer = (layer: BaseLayerType): void => {
@@ -372,8 +408,87 @@ const handleKeydown = (e: KeyboardEvent): void => {
 	}
 };
 
+const handleLoadCourses = async () => {
+	try {
+		courses.value = await listCourses();
+	} catch (err) {
+		console.warn("Failed to load courses:", err);
+	}
+};
+
+const handleAddCourse = () => {
+	editingCourse.value = null;
+	showCourseForm.value = true;
+};
+
+const handleEditCourse = (course: Course) => {
+	editingCourse.value = course;
+	showCourseForm.value = true;
+};
+
+const handleSaveCourse = async (input: CourseCreateInput) => {
+	try {
+		if (editingCourse.value) {
+			await updateCourse({ ...input, id: editingCourse.value.id });
+		} else {
+			await createCourse(input);
+		}
+		await handleLoadCourses();
+		showCourseForm.value = false;
+		editingCourse.value = null;
+	} catch (err) {
+		console.warn("Failed to save course:", err);
+		window.alert("保存课程失败");
+	}
+};
+
+const handleDeleteCourse = async (id: number) => {
+	if (!window.confirm("确定要删除这个课程吗？")) return;
+	try {
+		await deleteCourse(id);
+		await handleLoadCourses();
+	} catch (err) {
+		console.warn("Failed to delete course:", err);
+		window.alert("删除课程失败");
+	}
+};
+
+const handleImportCourses = () => {
+	showCourseImport.value = true;
+};
+
+const handleImportCoursesSubmit = async (rows: CourseImportRow[]) => {
+	try {
+		await importCourses(rows);
+		await handleLoadCourses();
+		showCourseImport.value = false;
+	} catch (err) {
+		console.warn("Failed to import courses:", err);
+		window.alert("导入课程失败");
+	}
+};
+
+const handleSelectCourse = (course: Course) => {
+	cesiumViewerRef.value?.flyToBuildingByName(course.buildingName);
+};
+
+const handleFilterCourses = (buildingName: string) => {
+	// 可以在这里添加筛选逻辑
+};
+
+const handleCourseBubbleClick = (buildingName: string, x: number, y: number) => {
+	const buildingCourses = coursesByBuilding.value.get(buildingName) || [];
+	courseDetailInfo.value = {
+		buildingName,
+		courses: buildingCourses,
+		x,
+		y,
+	};
+};
+
 onMounted(() => {
 	window.addEventListener('keydown', handleKeydown);
+	handleLoadCourses();
 	const cached = localStorage.getItem(STORAGE_KEY);
 	if (!cached) {
 		return;
@@ -442,10 +557,20 @@ onUnmounted(() => {
 				:geo-properties="buildingPopupInfo?.properties ?? {}"
 				:layer-name="selectedLayerName"
 				:properties="selectedLayerProperties"
+				:courses="courses"
+				:current-week="currentWeek"
+				:current-day="currentDay"
+				:course-buildings="courseBuildings"
 				@update:active-panel="(v) => (activePanel = v)"
 				@select-layer="(id) => (selectedLayerId = id)"
 				@select-building="handleSelectBuildingFromPanel"
 				@update:search-query="(q) => (buildingSearchQuery = q)"
+				@add-course="handleAddCourse"
+				@edit-course="handleEditCourse"
+				@delete-course="handleDeleteCourse"
+				@import-courses="handleImportCourses"
+				@select-course="handleSelectCourse"
+				@filter-courses="handleFilterCourses"
 			/>
 			<CesiumViewer
 				ref="cesiumViewerRef"
@@ -480,6 +605,27 @@ onUnmounted(() => {
 			:properties="editingEntity?.properties ?? {}"
 			@save="handleSaveProperties"
 			@cancel="editingEntity = null"
+		/>
+		<CourseForm
+			:visible="showCourseForm"
+			:course="editingCourse"
+			:buildings="courseBuildings"
+			@save="handleSaveCourse"
+			@cancel="showCourseForm = false"
+		/>
+		<CourseImport
+			:visible="showCourseImport"
+			@import="handleImportCoursesSubmit"
+			@cancel="showCourseImport = false"
+		/>
+		<CourseDetail
+			:visible="courseDetailInfo !== null"
+			:building-name="courseDetailInfo?.buildingName ?? ''"
+			:courses="courseDetailInfo?.courses ?? []"
+			:x="courseDetailInfo?.x ?? 0"
+			:y="courseDetailInfo?.y ?? 0"
+			@close="courseDetailInfo = null"
+			@edit="handleEditCourse"
 		/>
 	</div>
 </template>
