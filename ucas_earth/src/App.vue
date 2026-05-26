@@ -395,32 +395,13 @@ const handleSelectEntity = (info: { layerId: string; featureIndex: number; prope
 	buildingPopupInfo.value = info;
 };
 
-const handleHeightChange = (height: number): void => {
-	if (!buildingPopupInfo.value) return;
+const handleEditHeightChange = (height: number): void => {
+	if (!editingEntity.value) return;
 	cesiumViewerRef.value?.updateBuildingHeight(
-		buildingPopupInfo.value.layerId,
-		buildingPopupInfo.value.featureIndex,
+		editingEntity.value.layerId,
+		editingEntity.value.featureIndex,
 		height
 	);
-};
-
-const handleHeightChangeEnd = (height: number): void => {
-	if (!buildingPopupInfo.value) return;
-	const info = buildingPopupInfo.value;
-	const layer = cityLayers.value.find((l) => l.id === info.layerId);
-	if (!layer) return;
-	const fc = layer.geojson as { features: { properties: Record<string, unknown> }[] };
-	if (fc.features && fc.features[info.featureIndex]) {
-		fc.features[info.featureIndex]!.properties.Height = height;
-		fc.features[info.featureIndex]!.properties.height = height;
-	}
-	layer.geojson = markRaw({ ...layer.geojson });
-	info.properties.Height = height;
-	info.properties.height = height;
-
-	dbUpdateLayer(layer.name, layer.geojson).catch((err) => {
-		console.warn("Failed to sync height to database:", err);
-	});
 };
 
 const handleShowBuildingDetail = (): void => {
@@ -624,11 +605,6 @@ onUnmounted(() => {
 			:building-name="String(buildingPopupInfo?.properties?.name || buildingPopupInfo?.properties?.Name || '')"
 			:building-type="currentBuildingType"
 			:courses="coursesByBuilding.get(String(buildingPopupInfo?.properties?.name || buildingPopupInfo?.properties?.Name || '')) ?? []"
-			:current-height="Number(buildingPopupInfo?.properties?.Height ?? buildingPopupInfo?.properties?.height ?? 12)"
-			:layer-id="buildingPopupInfo?.layerId ?? ''"
-			:feature-index="buildingPopupInfo?.featureIndex ?? 0"
-			@height-change="handleHeightChange"
-			@height-change-end="handleHeightChangeEnd"
 			@show-detail="handleShowBuildingDetail"
 			@close="buildingPopupInfo = null"
 		/>
@@ -647,6 +623,7 @@ onUnmounted(() => {
 			:properties="editingEntity?.properties ?? {}"
 			@save="handleSaveProperties"
 			@cancel="editingEntity = null"
+			@height-change="handleEditHeightChange"
 		/>
 		<CourseForm
 			:visible="showCourseForm"

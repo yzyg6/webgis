@@ -7,7 +7,26 @@
         <button class="close-btn" type="button" @click="emit('cancel')">✕</button>
       </div>
       <div class="panel-body">
-        <div class="form-row" v-for="(value, key) in editData" :key="key">
+        <div class="height-section">
+          <div class="height-label">
+            <span class="height-text">建筑高度</span>
+            <span class="height-value">{{ sliderHeight }}m</span>
+          </div>
+          <input
+            type="range"
+            class="height-slider"
+            :min="HEIGHT_MIN"
+            :max="HEIGHT_MAX"
+            :step="1"
+            v-model.number="sliderHeight"
+            @input="onHeightInput"
+          />
+          <div class="height-range">
+            <span>{{ HEIGHT_MIN }}m</span>
+            <span>{{ HEIGHT_MAX }}m</span>
+          </div>
+        </div>
+        <div class="form-row" v-for="[key, value] in filteredEntries" :key="key">
           <label class="form-label">{{ key }}</label>
           <input
             class="form-input"
@@ -15,7 +34,7 @@
             @input="onInput(key, ($event.target as HTMLInputElement).value)"
           />
         </div>
-        <div class="empty-tip" v-if="Object.keys(editData).length === 0">无属性数据</div>
+        <div class="empty-tip" v-if="filteredEntries.length === 0">无属性数据</div>
       </div>
       <div class="panel-footer">
         <button class="btn btn-cancel" type="button" @click="emit('cancel')">取消</button>
@@ -26,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -38,13 +57,19 @@ const props = defineProps<{
 const emit = defineEmits<{
   save: [properties: Record<string, unknown>];
   cancel: [];
+  'heightChange': [height: number];
 }>();
 
+const HEIGHT_MIN = 5;
+const HEIGHT_MAX = 50;
+
 const editData = ref<Record<string, unknown>>({});
+const sliderHeight = ref(12);
 
 watch(() => props.visible, (val) => {
   if (val) {
     editData.value = { ...props.properties };
+    sliderHeight.value = Number(editData.value.Height ?? editData.value.height ?? 12);
   }
 });
 
@@ -53,9 +78,21 @@ const onInput = (key: string, value: string): void => {
   editData.value[key] = value !== '' && !isNaN(num) && isFinite(num) ? num : value;
 };
 
+const onHeightInput = (): void => {
+  editData.value.Height = sliderHeight.value;
+  editData.value.height = sliderHeight.value;
+  emit('heightChange', sliderHeight.value);
+};
+
 const onSave = (): void => {
+  editData.value.Height = sliderHeight.value;
+  editData.value.height = sliderHeight.value;
   emit('save', { ...editData.value });
 };
+
+const filteredEntries = computed(() => {
+  return Object.entries(editData.value).filter(([key]) => key !== 'Height' && key !== 'height');
+});
 </script>
 
 <style scoped>
@@ -151,6 +188,61 @@ const onSave = (): void => {
 
 .form-input:focus {
   border-color: var(--border-input-focus);
+}
+
+.height-section {
+  padding: 10px 0 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 10px;
+}
+
+.height-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.height-text {
+  font-size: 12px;
+  color: var(--text-label-strong);
+  font-weight: 500;
+}
+
+.height-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-accent);
+}
+
+.height-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border-subtle);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.height-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-accent);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.height-range {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
 }
 
 .panel-footer {
