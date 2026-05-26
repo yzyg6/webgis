@@ -302,9 +302,14 @@ const applyFeatureExtrusion = (dataSource: Cesium.GeoJsonDataSource): void => {
 
 		entity.polygon.height = new Cesium.ConstantProperty(0);
 		entity.polygon.extrudedHeight = new Cesium.ConstantProperty(height);
-		entity.polygon.material = new Cesium.ColorMaterialProperty(
-			Cesium.Color.fromCssColorString(style.color).withAlpha(style.alpha)
-		);
+		// 建筑使用高度渐变颜色，其他类型使用固定颜色
+		if (featureType === 'building') {
+			entity.polygon.material = new Cesium.ColorMaterialProperty(getBuildingColor(height));
+		} else {
+			entity.polygon.material = new Cesium.ColorMaterialProperty(
+				Cesium.Color.fromCssColorString(style.color).withAlpha(style.alpha)
+			);
+		}
 		entity.polygon.outline = new Cesium.ConstantProperty(true);
 		entity.polygon.outlineColor = new Cesium.ConstantProperty(
 			Cesium.Color.fromCssColorString(style.outlineColor).withAlpha(style.outlineAlpha)
