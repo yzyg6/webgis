@@ -7,6 +7,8 @@
 <script setup lang="ts">
 import { markRaw, onMounted, onUnmounted, ref, toRaw, watch } from "vue";
 import * as Cesium from "cesium";
+import { getBuildingType } from '../data/building-type-mapping';
+import type { BuildingType } from '../types/building';
 
 type BaseLayerType = "osm" | "arcgis" | "carto";
 type GeoJsonObject = Record<string, unknown>;
@@ -183,42 +185,42 @@ const parseHeightValue = (value: unknown): number | null => {
 	return null;
 };
 
-const getFeatureType = (properties: Cesium.PropertyBag | undefined): FeatureType => {
+const getFeatureType = (properties: Cesium.PropertyBag | undefined): { type: FeatureType; buildingType?: BuildingType } => {
 	if (!properties) {
-		return 'other';
+		return { type: 'other' };
 	}
 
 	const values = properties.getValue(Cesium.JulianDate.now()) as Record<string, unknown> | undefined;
 	if (!values) {
-		return 'other';
+		return { type: 'other' };
 	}
 
 	// Check for building
 	if (values.building !== undefined && values.building !== null) {
-		return 'building';
+		return { type: 'building', buildingType: getBuildingType(values) };
 	}
 
 	// Check for road
 	if (values.highway || values.road || values.road_type) {
-		return 'road';
+		return { type: 'road' };
 	}
 
 	// Check for water
 	if (values.water || values.waterway || values.natural === 'water') {
-		return 'water';
+		return { type: 'water' };
 	}
 
 	// Check for green space
 	if (values.landuse === 'grass' || values.landuse === 'forest' || values.leisure === 'park' || values.natural === 'wood') {
-		return 'green';
+		return { type: 'green' };
 	}
 
 	// Check for building by height properties
 	if (values.Height !== undefined || values.height !== undefined || values["building:levels"] !== undefined) {
-		return 'building';
+		return { type: 'building', buildingType: getBuildingType(values) };
 	}
 
-	return 'other';
+	return { type: 'other' };
 };
 
 const readBuildingHeight = (properties: Cesium.PropertyBag | undefined): number => {
@@ -274,7 +276,9 @@ const applyFeatureExtrusion = (dataSource: Cesium.GeoJsonDataSource): void => {
 		}
 
 		const properties = entity.properties;
-		const featureType = getFeatureType(properties);
+		const featureResult = getFeatureType(properties);
+		const featureType = featureResult.type;
+		const buildingType: BuildingType | undefined = featureResult.buildingType;
 		const style = FEATURE_STYLES[featureType];
 		const height = readFeatureHeight(properties, featureType);
 
