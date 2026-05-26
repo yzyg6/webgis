@@ -247,6 +247,23 @@ const readBuildingHeight = (properties: Cesium.PropertyBag | undefined): number 
 	return DEFAULT_BUILDING_HEIGHT;
 };
 
+/**
+ * 根据建筑高度计算渐变颜色
+ * 浅蓝 #a8d8ff (矮楼) → 深蓝 #1a8cff (高楼)
+ */
+const getBuildingColor = (height: number): Cesium.Color => {
+	const minH = 5;
+	const maxH = 40;
+	const ratio = Math.min(1, Math.max(0, (height - minH) / (maxH - minH)));
+
+	// 浅蓝 #a8d8ff (168, 216, 255) → 深蓝 #1a8cff (26, 140, 255)
+	const r = (168 + (26 - 168) * ratio) / 255;
+	const g = (216 + (140 - 216) * ratio) / 255;
+	const b = 255 / 255;
+
+	return new Cesium.Color(r, g, b, 0.7);
+};
+
 const readFeatureHeight = (properties: Cesium.PropertyBag | undefined, featureType: FeatureType): number => {
 	if (featureType === 'building') {
 		return readBuildingHeight(properties);
