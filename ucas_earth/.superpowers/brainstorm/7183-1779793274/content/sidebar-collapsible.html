@@ -1,0 +1,36 @@
+<h2>侧栏整体是否可隐藏？</h2>
+<p class="subtitle">是否需要一个快捷方式隐藏整个侧栏（包括图标），最大化地图视野？</p>
+
+<div class="cards">
+  <div class="card" data-choice="always-visible" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;padding:16px;height:120px;background:#0a2332;border-radius:8px;align-items:flex-start;justify-content:center;">
+        <div style="width:40px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:14px;">
+          <div style="width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;">📋</div>
+          <div style="width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;">🏫</div>
+          <div style="width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;">📊</div>
+        </div>
+        <div style="flex:1;margin-left:8px;background:rgba(100,200,255,0.05);border:1px dashed rgba(100,200,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(160,224,255,0.3);">地图区域</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>始终可见</h3>
+      <p>侧栏图标始终固定在左侧，只隐藏内容区。40px 宽度不可省略</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="collapsible" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;padding:16px;height:120px;background:#0a2332;border-radius:8px;align-items:flex-start;justify-content:center;">
+        <div style="flex:1;background:rgba(100,200,255,0.05);border:1px dashed rgba(100,200,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(160,224,255,0.3);position:relative;">
+          地图区域（全宽）
+          <div style="position:absolute;left:4px;top:50%;transform:translateY(-50%);width:18px;height:36px;background:rgba(5,25,39,0.9);border:1px solid rgba(160,224,255,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#7ee6ff;">▶</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>可完全隐藏</h3>
+      <p>快捷键或按钮可隐藏整个侧栏，地图左边缘显示一个小箭头恢复</p>
+    </div>
+  </div>
+</div>

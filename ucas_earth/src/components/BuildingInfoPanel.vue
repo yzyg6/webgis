@@ -1,11 +1,10 @@
 <!-- ucas_earth/src/components/BuildingInfoPanel.vue -->
 <template>
-  <div class="building-panel" :class="{ collapsed: collapsed }">
-    <div class="panel-header" @click="emit('toggle-collapse')">
+  <div class="building-panel">
+    <div class="panel-header">
       <span class="panel-title">🏫 建筑信息</span>
-      <span class="panel-arrow">{{ collapsed ? '▶' : '▼' }}</span>
     </div>
-    <div class="panel-body" v-show="!collapsed">
+    <div class="panel-body">
       <!-- 搜索框 -->
       <div class="search-box">
         <input
@@ -88,13 +87,11 @@ const props = defineProps<{
   selectedBuilding: BuildingMeta | null;
   searchQuery: string;
   geoProperties: Record<string, unknown>;
-  collapsed: boolean;
 }>();
 
 const emit = defineEmits<{
   'select-building': [meta: BuildingMeta];
   'update:searchQuery': [query: string];
-  'toggle-collapse': [];
 }>();
 
 const filteredBuildings = computed(() => {
@@ -133,33 +130,18 @@ const geoProperties = computed(() => {
 
 <style scoped>
 .building-panel {
-  width: 320px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-primary);
-  border-radius: 10px;
-  box-shadow: var(--shadow-panel);
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  transition: width 0.2s ease;
-}
-
-.building-panel.collapsed {
-  width: 40px;
 }
 
 .panel-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 10px 12px;
   border-bottom: 1px solid var(--border-subtle);
-  cursor: pointer;
   user-select: none;
-}
-
-.panel-header:hover {
-  background: var(--bg-hover);
-  border-radius: 10px 10px 0 0;
 }
 
 .panel-title {
@@ -168,23 +150,10 @@ const geoProperties = computed(() => {
   color: var(--text-primary);
 }
 
-.collapsed .panel-title {
-  display: none;
-}
-
-.panel-arrow {
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-
 .panel-body {
   overflow-y: auto;
   max-height: 500px;
   padding: 6px;
-}
-
-.collapsed .panel-body {
-  display: none;
 }
 
 .search-box {

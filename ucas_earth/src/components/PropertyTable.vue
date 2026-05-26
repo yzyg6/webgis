@@ -1,10 +1,9 @@
 <template>
-  <div class="property-table" :class="{ collapsed: collapsed }">
-    <div class="panel-header" @click="emit('toggleCollapse')">
+  <div class="property-table">
+    <div class="panel-header">
       <span class="panel-title">📊 属性表</span>
-      <span class="panel-arrow">{{ collapsed ? '▶' : '▼' }}</span>
     </div>
-    <div class="panel-body" v-show="!collapsed">
+    <div class="panel-body">
       <div class="empty-tip" v-if="!layerName">请先在上方选择一个图层</div>
       <template v-else>
         <div class="table-title">{{ layerName }}</div>
@@ -39,11 +38,6 @@ import { computed } from 'vue';
 const props = defineProps<{
   layerName: string;
   properties: Record<string, unknown>[];
-  collapsed: boolean;
-}>();
-
-const emit = defineEmits<{
-  toggleCollapse: [];
 }>();
 
 const columns = computed(() => {
@@ -66,35 +60,20 @@ const formatCell = (value: unknown): string => {
 
 <style scoped>
 .property-table {
-  width: 320px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-primary);
-  border-radius: 10px;
-  box-shadow: var(--shadow-panel);
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  transition: width 0.2s ease;
   min-height: 0;
-}
-
-.property-table.collapsed {
-  width: 40px;
 }
 
 .panel-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 10px 12px;
   border-bottom: 1px solid var(--border-subtle);
-  cursor: pointer;
   user-select: none;
   flex-shrink: 0;
-}
-
-.panel-header:hover {
-  background: var(--bg-hover);
-  border-radius: 10px 10px 0 0;
 }
 
 .panel-title {
@@ -103,24 +82,11 @@ const formatCell = (value: unknown): string => {
   color: var(--text-primary);
 }
 
-.collapsed .panel-title {
-  display: none;
-}
-
-.panel-arrow {
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-
 .panel-body {
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-}
-
-.collapsed .panel-body {
-  display: none;
 }
 
 .table-title {

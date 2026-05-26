@@ -2,12 +2,10 @@
 import { computed, markRaw, onMounted, onUnmounted, ref, watch } from "vue";
 import Header from "./components/Header.vue";
 import CesiumViewer from "./components/CesiumViewer.vue";
-import LayerPanel from "./components/LayerPanel.vue";
-import PropertyTable from "./components/PropertyTable.vue";
+import SidebarContainer from "./components/SidebarContainer.vue";
 import HoverTooltip from "./components/HoverTooltip.vue";
 import EditPanel from "./components/EditPanel.vue";
 import BuildingPopup from "./components/BuildingPopup.vue";
-import BuildingInfoPanel from "./components/BuildingInfoPanel.vue";
 import { createLayer as dbCreateLayer, listLayers as dbListLayers, getLayer as dbGetLayer, updateLayer as dbUpdateLayer } from "./api/geojson-db";
 import type { GeoJsonLayerMeta } from "./types/geojson-db";
 import { getBuildingMeta, getAllBuildingMetas } from "./data/campus-buildings";
@@ -32,8 +30,7 @@ const isLoadingFromDb = ref(false);
 const showDbPanel = ref(false);
 
 const selectedLayerId = ref<string | null>(null);
-const layerPanelCollapsed = ref(false);
-const propertyPanelCollapsed = ref(false);
+const activePanel = ref<string | null>(null);
 
 type HoverInfo = { layerId: string; featureIndex: number; properties: Record<string, unknown>; x: number; y: number };
 type EditInfo = { layerId: string; featureIndex: number; properties: Record<string, unknown> };
@@ -47,7 +44,6 @@ const buildingPopupInfo = ref<{
 	properties: Record<string, unknown>; x: number; y: number;
 } | null>(null);
 const buildingSearchQuery = ref('');
-const buildingPanelCollapsed = ref(false);
 const allBuildings = getAllBuildingMetas();
 const cesiumViewerRef = ref<InstanceType<typeof CesiumViewer> | null>(null);
 
@@ -436,31 +432,21 @@ onUnmounted(() => {
 			@close-db-panel="handleCloseDbPanel"
 		/>
 		<main class="app-main">
-			<div class="side-panels">
-				<LayerPanel
-					:layers="layerMetaList"
-					:selected-layer-id="selectedLayerId"
-					:collapsed="layerPanelCollapsed"
-					@select-layer="(id) => (selectedLayerId = id)"
-					@toggle-collapse="layerPanelCollapsed = !layerPanelCollapsed"
-				/>
-				<BuildingInfoPanel
-					:buildings="allBuildings"
-					:selected-building="selectedBuilding"
-					:search-query="buildingSearchQuery"
-					:geo-properties="buildingPopupInfo?.properties ?? {}"
-					:collapsed="buildingPanelCollapsed"
-					@select-building="handleSelectBuildingFromPanel"
-					@update:search-query="(q) => (buildingSearchQuery = q)"
-					@toggle-collapse="buildingPanelCollapsed = !buildingPanelCollapsed"
-				/>
-				<PropertyTable
-					:layer-name="selectedLayerName"
-					:properties="selectedLayerProperties"
-					:collapsed="propertyPanelCollapsed"
-					@toggle-collapse="propertyPanelCollapsed = !propertyPanelCollapsed"
-				/>
-			</div>
+			<SidebarContainer
+				:active-panel="activePanel"
+				:layers="layerMetaList"
+				:selected-layer-id="selectedLayerId"
+				:buildings="allBuildings"
+				:selected-building="selectedBuilding"
+				:search-query="buildingSearchQuery"
+				:geo-properties="buildingPopupInfo?.properties ?? {}"
+				:layer-name="selectedLayerName"
+				:properties="selectedLayerProperties"
+				@update:active-panel="(v) => (activePanel = v)"
+				@select-layer="(id) => (selectedLayerId = id)"
+				@select-building="handleSelectBuildingFromPanel"
+				@update:search-query="(q) => (buildingSearchQuery = q)"
+			/>
 			<CesiumViewer
 				ref="cesiumViewerRef"
 				:base-layer="currentBaseLayer"
@@ -513,13 +499,5 @@ onUnmounted(() => {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	gap: 10px;
-}
-
-.side-panels {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	min-width: 0;
-	overflow-y: auto;
 }
 </style>

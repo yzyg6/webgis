@@ -1,0 +1,69 @@
+<h2>内容区展开动画</h2>
+<p class="subtitle">点击图标时，内容面板如何出现？</p>
+
+<div class="cards">
+  <div class="card" data-choice="slide" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:0;padding:16px;height:160px;background:#0a2332;border-radius:8px;align-items:flex-start;">
+        <div style="width:36px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px 0 0 8px;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:10px;">
+          <div style="width:22px;height:22px;background:rgba(40,105,148,0.7);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;">📋</div>
+          <div style="width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;">🏫</div>
+        </div>
+        <div style="width:160px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-left:none;border-radius:0 8px 8px 0;padding:10px;font-size:10px;color:#daf2ff;position:relative;overflow:hidden;">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to right,rgba(100,200,255,0.4),transparent);"></div>
+          📋 图层列表<br><br>
+          <div style="width:100%;height:6px;background:rgba(100,200,255,0.1);border-radius:3px;margin:3px 0;"></div>
+          <div style="width:80%;height:6px;background:rgba(100,200,255,0.1);border-radius:3px;margin:3px 0;"></div>
+          <div style="width:60%;height:6px;background:rgba(100,200,255,0.1);border-radius:3px;margin:3px 0;"></div>
+          <div style="text-align:center;margin-top:12px;color:rgba(160,224,255,0.4);font-size:9px;">← 从左侧滑入</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>滑入滑出</h3>
+      <p>内容区从侧栏边缘向右滑出，收起时向左滑回。经典、流畅</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="fade" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:0;padding:16px;height:160px;background:#0a2332;border-radius:8px;align-items:flex-start;">
+        <div style="width:36px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px 0 0 8px;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:10px;">
+          <div style="width:22px;height:22px;background:rgba(40,105,148,0.7);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;">📋</div>
+          <div style="width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;">🏫</div>
+        </div>
+        <div style="width:160px;background:rgba(5,25,39,0.85);border:1px solid rgba(160,224,255,0.25);border-left:none;border-radius:0 8px 8px 0;padding:10px;font-size:10px;color:rgba(218,242,255,0.7);">
+          📋 图层列表<br><br>
+          <div style="width:100%;height:6px;background:rgba(100,200,255,0.08);border-radius:3px;margin:3px 0;"></div>
+          <div style="width:80%;height:6px;background:rgba(100,200,255,0.08);border-radius:3px;margin:3px 0;"></div>
+          <div style="text-align:center;margin-top:16px;color:rgba(160,224,255,0.3);font-size:9px;">淡入淡出</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>淡入淡出</h3>
+      <p>内容区直接出现/消失，无位移。简洁、快速</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="expand" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:0;padding:16px;height:160px;background:#0a2332;border-radius:8px;align-items:flex-start;">
+        <div style="width:36px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px 0 0 8px;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:10px;">
+          <div style="width:22px;height:22px;background:rgba(40,105,148,0.7);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;">📋</div>
+          <div style="width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;">🏫</div>
+        </div>
+        <div style="width:160px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-left:none;border-radius:0 8px 8px 0;padding:10px;font-size:10px;color:#daf2ff;">
+          <div style="font-size:10px;font-weight:600;color:rgba(160,224,255,0.9);margin-bottom:8px;">📋 图层列表</div>
+          <div style="width:100%;height:6px;background:rgba(100,200,255,0.1);border-radius:3px;margin:3px 0;"></div>
+          <div style="width:80%;height:6px;background:rgba(100,200,255,0.1);border-radius:3px;margin:3px 0;"></div>
+          <div style="text-align:center;margin-top:12px;color:rgba(160,224,255,0.3);font-size:9px;">宽度展开</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>宽度展开</h3>
+      <p>内容区从 0 宽度逐渐展开，推挤地图区域。空间感明确</p>
+    </div>
+  </div>
+</div>

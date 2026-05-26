@@ -1,0 +1,77 @@
+<h2>侧边面板展开/收起逻辑</h2>
+<p class="subtitle">当前有 3 个独立折叠面板，点击你想改进的方向</p>
+
+<div class="cards">
+  <div class="card" data-choice="current" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:8px;padding:16px;height:200px;background:#0a2332;border-radius:8px;">
+        <!-- Expanded panel -->
+        <div style="width:180px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="padding:8px 10px;border-bottom:1px solid rgba(160,224,255,0.15);font-size:11px;color:#daf2ff;">📋 图层列表 ▼</div>
+          <div style="padding:6px;font-size:10px;color:#daf2ff;">
+            <div style="padding:4px 6px;background:rgba(40,105,148,0.7);border-radius:4px;margin-bottom:3px;">FYUN_Building</div>
+            <div style="padding:4px 6px;">campus.geojson</div>
+          </div>
+        </div>
+        <!-- Collapsed panel -->
+        <div style="width:28px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:11px;color:#daf2ff;">▶</span>
+        </div>
+        <!-- Collapsed panel -->
+        <div style="width:28px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:11px;color:#daf2ff;">▶</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>当前行为</h3>
+      <p>3 个面板各自独立折叠，宽度 320px → 40px，各自有独立的 collapsed 状态</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="accordion" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:8px;padding:16px;height:200px;background:#0a2332;border-radius:8px;">
+        <!-- Expanded panel (tall) -->
+        <div style="width:180px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="padding:8px 10px;border-bottom:1px solid rgba(160,224,255,0.15);font-size:11px;color:#daf2ff;background:rgba(40,105,148,0.7);">📋 图层列表 ▼</div>
+          <div style="padding:6px;font-size:10px;color:#daf2ff;flex:1;">
+            <div style="padding:4px 6px;margin-bottom:3px;">FYUN_Building</div>
+            <div style="padding:4px 6px;">campus.geojson</div>
+          </div>
+          <div style="padding:8px 10px;border-top:1px solid rgba(160,224,255,0.15);font-size:11px;color:rgba(218,242,255,0.5);">🏫 建筑信息 ▶</div>
+          <div style="padding:8px 10px;border-top:1px solid rgba(160,224,255,0.15);font-size:11px;color:rgba(218,242,255,0.5);">📊 属性表 ▶</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>手风琴模式</h3>
+      <p>同一时间只展开一个面板，展开一个自动收起其他</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="sidebar" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:8px;padding:16px;height:200px;background:#0a2332;border-radius:8px;">
+        <!-- Collapsed sidebar with icons -->
+        <div style="width:36px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:12px;">
+          <div style="width:24px;height:24px;background:rgba(40,105,148,0.7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">📋</div>
+          <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">🏫</div>
+          <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">📊</div>
+        </div>
+        <!-- Expanded content area -->
+        <div style="flex:1;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="padding:8px 10px;border-bottom:1px solid rgba(160,224,255,0.15);font-size:11px;color:#daf2ff;">📋 图层列表</div>
+          <div style="padding:6px;font-size:10px;color:#daf2ff;">
+            <div style="padding:4px 6px;background:rgba(40,105,148,0.7);border-radius:4px;margin-bottom:3px;">FYUN_Building</div>
+            <div style="padding:4px 6px;">campus.geojson</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>图标侧栏 + 内容区</h3>
+      <p>左侧窄图标栏固定，点击图标切换右侧显示内容，类似 VS Code</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<h2>侧栏行为细节</h2>
+<p class="subtitle">当没有选中任何面板时，内容区域如何处理？</p>
+
+<div class="cards">
+  <div class="card" data-choice="hide-content" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:8px;padding:16px;height:180px;background:#0a2332;border-radius:8px;">
+        <div style="width:36px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:12px;">
+          <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">📋</div>
+          <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">🏫</div>
+          <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">📊</div>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;color:rgba(160,224,255,0.3);font-size:11px;">
+          <!-- Empty content area -->
+          ← 点击图标展开
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>自动隐藏</h3>
+      <p>再次点击已展开的图标，内容区收起消失，最大化地图视野</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="keep-one" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:8px;padding:16px;height:180px;background:#0a2332;border-radius:8px;">
+        <div style="width:36px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:12px;">
+          <div style="width:24px;height:24px;background:rgba(40,105,148,0.7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">📋</div>
+          <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">🏫</div>
+          <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">📊</div>
+        </div>
+        <div style="flex:1;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;padding:8px 10px;font-size:11px;color:#daf2ff;">
+          📋 图层列表<br><br>
+          <span style="color:rgba(218,242,255,0.5);">始终有一个面板展开</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>始终保留一个</h3>
+      <p>至少有一个面板展开，点击其他图标切换内容，不能完全收起</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="toggle-individual" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:8px;padding:16px;height:180px;background:#0a2332;border-radius:8px;">
+        <div style="width:36px;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:12px;">
+          <div style="width:24px;height:24px;background:rgba(40,105,148,0.7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">📋</div>
+          <div style="width:24px;height:24px;background:rgba(40,105,148,0.7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">🏫</div>
+          <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">📊</div>
+        </div>
+        <div style="flex:1;background:rgba(5,25,39,0.95);border:1px solid rgba(160,224,255,0.32);border-radius:8px;padding:8px 10px;font-size:11px;color:#daf2ff;">
+          📋 图层列表 | 🏫 建筑信息<br><br>
+          <span style="color:rgba(218,242,255,0.5);">多面板可同时展开</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>独立切换</h3>
+      <p>每个图标独立 toggle，可同时展开多个面板，内容区垂直堆叠</p>
+    </div>
+  </div>
+</div>
