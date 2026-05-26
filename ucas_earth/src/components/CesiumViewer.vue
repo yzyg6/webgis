@@ -490,7 +490,18 @@ const flyToBuildingByName = (name: string): boolean => {
 	return false;
 };
 
-defineExpose({ flyToBuildingByName });
+const updateBuildingHeight = (layerId: string, featureIndex: number, height: number): void => {
+	const dataSource = cityModelDataSources.get(layerId);
+	if (!dataSource) return;
+	const entities = dataSource.entities.values;
+	const entity = entities[featureIndex] as EntityWithPolygon;
+	if (!entity?.polygon) return;
+
+	entity.polygon.extrudedHeight = new Cesium.ConstantProperty(height);
+	entity.polygon.material = new Cesium.ColorMaterialProperty(getBuildingColor(height));
+};
+
+defineExpose({ flyToBuildingByName, updateBuildingHeight });
 
 watch(
 	() => props.baseLayer,
