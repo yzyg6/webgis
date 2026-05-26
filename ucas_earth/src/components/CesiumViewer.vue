@@ -522,16 +522,25 @@ const setupMouseHandlers = (): void => {
 	hoverHandler.setInputAction((movement: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
 		const picked = viewer.scene.pick(movement.endPosition);
 		if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id instanceof Cesium.Entity) {
-			// Use toRaw() to remove Vue proxy wrapper from picked entity
 			const entity = toRaw(picked.id as Cesium.Entity);
 			const result = findLayerIdForEntity(entity);
 			if (result) {
+				const properties = getEntityProperties(entity);
+				const featureResult = getFeatureType(entity.properties);
+
+				// 只对建筑显示悬停
+				if (featureResult.type !== 'building') {
+					restoreHighlight();
+					emit("hoverEntity", null);
+					return;
+				}
+
 				const featureIndex = findFeatureIndex(entity, result.dataSource);
 				highlightEntity(entity);
 				emit("hoverEntity", {
 					layerId: result.layerId,
 					featureIndex,
-					properties: getEntityProperties(entity),
+					properties,
 					x: movement.endPosition.x,
 					y: movement.endPosition.y,
 				});
