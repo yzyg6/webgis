@@ -95,12 +95,14 @@
       </div>
     </div>
 
+    <ThemeToggle />
     <div class="meta">{{ todayText }}</div>
   </header>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import ThemeToggle from "./ThemeToggle.vue";
 
 type BaseLayerType = "osm" | "arcgis" | "carto";
 type CityLayerMeta = {
@@ -204,14 +206,14 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 
 <style scoped>
 .app-header {
-  background: linear-gradient(110deg, rgba(0, 20, 38, 0.95), rgba(0, 48, 72, 0.85));
-  border-bottom: 1px solid rgba(180, 229, 255, 0.25);
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-header);
   padding: 0 20px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 24px;
-  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-header);
 }
 
 .title-wrap {
@@ -226,24 +228,24 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
   line-height: 1;
   font-weight: 700;
   letter-spacing: 0.8px;
-  color: #daf2ff;
+  color: var(--text-primary);
 }
 
 .subtitle {
   margin: 0;
   font-size: 12px;
-  color: rgba(218, 242, 255, 0.75);
+  color: var(--text-secondary);
   letter-spacing: 1px;
 }
 
 .meta {
   margin-left: auto;
   padding: 6px 10px;
-  border: 1px solid rgba(140, 200, 237, 0.4);
+  border: 1px solid var(--border-badge);
   border-radius: 999px;
   font-size: 12px;
-  color: #d8f2ff;
-  background: rgba(10, 34, 56, 0.45);
+  color: var(--text-primary);
+  background: var(--bg-badge);
 }
 
 .menu-bar {
@@ -264,9 +266,9 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 
   padding: 6px 10px;
   border-radius: 8px;
-  border: 1px solid rgba(155, 217, 251, 0.22);
-  background: rgba(7, 33, 54, 0.55);
-  color: #d7f0ff;
+  border: 1px solid var(--border-menu);
+  background: var(--bg-menu);
+  color: var(--text-primary);
   cursor: pointer;
   user-select: none;
 }
@@ -282,8 +284,8 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 }
 
 .menu-item:hover {
-  background: rgba(18, 58, 89, 0.8);
-  border-color: rgba(175, 229, 255, 0.4);
+  background: var(--bg-menu-hover);
+  border-color: var(--border-menu-hover);
 }
 
 .menu-icon,
@@ -302,9 +304,9 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
   gap: 2px;
   padding: 6px;
   border-radius: 10px;
-  border: 1px solid rgba(160, 224, 255, 0.32);
-  background: rgba(5, 25, 39, 0.95);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-submenu);
   z-index: 20;
   opacity: 0;
   visibility: hidden;
@@ -330,13 +332,13 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
   width: 100%;
   padding: 6px 8px;
   background: transparent;
-  color: #daf2ff;
+  color: var(--text-primary);
   text-align: left;
   cursor: pointer;
 }
 
 .submenu-item:hover {
-  background: rgba(32, 84, 124, 0.7);
+  background: var(--bg-hover-strong);
 }
 
 .hidden-file-input {
@@ -351,7 +353,7 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 
 .path-tip {
   font-size: 12px;
-  color: rgba(190, 224, 243, 0.88);
+  color: var(--text-muted-strong);
 }
 
 .layer-list {
@@ -366,12 +368,12 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
   justify-content: space-between;
   gap: 8px;
   padding: 6px 4px;
-  border-top: 1px solid rgba(160, 224, 255, 0.14);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .layer-name {
   font-size: 12px;
-  color: #daf2ff;
+  color: var(--text-primary);
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -384,32 +386,32 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 }
 
 .path-load-btn {
-  border: 1px solid rgba(160, 224, 255, 0.35);
+  border: 1px solid var(--border-btn);
   border-radius: 8px;
   padding: 4px 8px;
-  background: rgba(23, 73, 108, 0.86);
-  color: #daf2ff;
+  background: var(--bg-btn);
+  color: var(--text-primary);
   cursor: pointer;
   font-size: 12px;
 }
 
 .path-load-btn:hover {
-  background: rgba(40, 105, 148, 0.92);
+  background: var(--bg-btn-hover);
 }
 
 .path-load-btn.danger {
-  border-color: rgba(253, 151, 151, 0.45);
-  background: rgba(118, 37, 37, 0.86);
+  border-color: var(--border-danger);
+  background: var(--bg-danger);
 }
 
 .path-load-btn.danger:hover {
-  background: rgba(155, 44, 44, 0.92);
+  background: var(--bg-danger-hover);
 }
 
 .empty-tip {
   margin: 4px 4px 6px;
   font-size: 12px;
-  color: rgba(190, 224, 243, 0.7);
+  color: var(--text-muted);
 }
 
 @media (max-width: 900px) {
@@ -448,7 +450,7 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--bg-overlay);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -456,14 +458,14 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 }
 
 .db-panel {
-  background: rgba(5, 25, 39, 0.98);
-  border: 1px solid rgba(160, 224, 255, 0.32);
+  background: var(--bg-panel-solid);
+  border: 1px solid var(--border-primary);
   border-radius: 12px;
   width: 480px;
   max-height: 70vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-modal);
 }
 
 .db-panel-header {
@@ -471,19 +473,19 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(160, 224, 255, 0.15);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .db-panel-title {
   font-size: 16px;
   font-weight: 600;
-  color: #daf2ff;
+  color: var(--text-primary);
 }
 
 .db-panel-close {
   background: transparent;
   border: 0;
-  color: rgba(190, 224, 243, 0.7);
+  color: var(--text-close);
   font-size: 18px;
   cursor: pointer;
   padding: 4px 8px;
@@ -491,8 +493,8 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 }
 
 .db-panel-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-close-hover);
+  color: var(--text-primary);
 }
 
 .db-panel-content {
@@ -504,7 +506,7 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 .db-loading,
 .db-empty {
   text-align: center;
-  color: rgba(190, 224, 243, 0.7);
+  color: var(--text-muted);
   font-size: 14px;
   padding: 24px 0;
 }
@@ -516,9 +518,9 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 .db-group-name {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(160, 224, 255, 0.9);
+  color: var(--text-accent-strong);
   padding: 8px 0 4px;
-  border-bottom: 1px solid rgba(160, 224, 255, 0.1);
+  border-bottom: 1px solid var(--border-divider);
   margin-bottom: 8px;
 }
 
@@ -539,7 +541,7 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 
 .db-layer-name {
   font-size: 13px;
-  color: #daf2ff;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -547,21 +549,21 @@ const todayText = new Intl.DateTimeFormat("zh-CN", {
 
 .db-layer-meta {
   font-size: 11px;
-  color: rgba(190, 224, 243, 0.6);
+  color: var(--text-muted);
 }
 
 .db-load-btn {
   flex-shrink: 0;
-  border: 1px solid rgba(160, 224, 255, 0.35);
+  border: 1px solid var(--border-btn);
   border-radius: 8px;
   padding: 6px 14px;
-  background: rgba(23, 73, 108, 0.86);
-  color: #daf2ff;
+  background: var(--bg-btn);
+  color: var(--text-primary);
   cursor: pointer;
   font-size: 12px;
 }
 
 .db-load-btn:hover {
-  background: rgba(40, 105, 148, 0.92);
+  background: var(--bg-btn-hover);
 }
 </style>

@@ -65,7 +65,7 @@ const onSave = (): void => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--bg-overlay);
   z-index: 1100;
   display: flex;
   align-items: center;
@@ -73,19 +73,19 @@ const onSave = (): void => {
 }
 
 .edit-panel {
-  background: rgba(5, 25, 39, 0.98);
-  border: 1px solid rgba(160, 224, 255, 0.32);
+  background: var(--bg-panel-solid);
+  border: 1px solid var(--border-primary);
   border-radius: 12px;
   width: 420px;
   max-height: 70vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-modal);
 }
 
 .panel-header {
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(160, 224, 255, 0.15);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -94,19 +94,19 @@ const onSave = (): void => {
 .panel-title {
   font-size: 15px;
   font-weight: 600;
-  color: #daf2ff;
+  color: var(--text-primary);
 }
 
 .panel-subtitle {
   font-size: 12px;
-  color: rgba(218, 242, 255, 0.5);
+  color: var(--text-secondary);
   flex: 1;
 }
 
 .close-btn {
   background: transparent;
   border: 0;
-  color: rgba(190, 224, 243, 0.7);
+  color: var(--text-close);
   font-size: 18px;
   cursor: pointer;
   padding: 4px 8px;
@@ -114,8 +114,8 @@ const onSave = (): void => {
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-close-hover);
+  color: var(--text-primary);
 }
 
 .panel-body {
@@ -133,36 +133,36 @@ const onSave = (): void => {
 
 .form-label {
   font-size: 12px;
-  color: rgba(160, 224, 255, 0.8);
+  color: var(--text-label-strong);
   min-width: 100px;
   flex-shrink: 0;
 }
 
 .form-input {
   flex: 1;
-  background: rgba(10, 35, 55, 0.8);
-  border: 1px solid rgba(160, 224, 255, 0.25);
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
   border-radius: 6px;
   padding: 6px 10px;
-  color: #daf2ff;
+  color: var(--text-primary);
   font-size: 12px;
   outline: none;
 }
 
 .form-input:focus {
-  border-color: rgba(160, 224, 255, 0.5);
+  border-color: var(--border-input-focus);
 }
 
 .panel-footer {
   padding: 12px 20px;
-  border-top: 1px solid rgba(160, 224, 255, 0.15);
+  border-top: 1px solid var(--border-subtle);
   display: flex;
   justify-content: flex-end;
   gap: 10px;
 }
 
 .btn {
-  border: 1px solid rgba(160, 224, 255, 0.35);
+  border: 1px solid var(--border-btn);
   border-radius: 8px;
   padding: 8px 20px;
   cursor: pointer;
@@ -170,27 +170,27 @@ const onSave = (): void => {
 }
 
 .btn-cancel {
-  background: rgba(30, 30, 30, 0.6);
-  color: rgba(218, 242, 255, 0.8);
+  background: var(--bg-cancel);
+  color: var(--text-secondary);
 }
 
 .btn-cancel:hover {
-  background: rgba(50, 50, 50, 0.8);
+  background: var(--bg-cancel-hover);
 }
 
 .btn-save {
-  background: rgba(23, 73, 108, 0.9);
-  color: #daf2ff;
+  background: var(--bg-btn);
+  color: var(--text-primary);
 }
 
 .btn-save:hover {
-  background: rgba(40, 105, 148, 0.95);
+  background: var(--bg-btn-hover);
 }
 
 .empty-tip {
   padding: 24px;
   text-align: center;
   font-size: 12px;
-  color: rgba(190, 224, 243, 0.6);
+  color: var(--text-muted);
 }
 </style>

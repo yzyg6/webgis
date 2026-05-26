@@ -77,11 +77,11 @@ const popupY = computed(() => {
 }
 
 .popup-content {
-  background: rgba(5, 25, 39, 0.95);
-  border: 1px solid rgba(160, 224, 255, 0.4);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-tooltip);
   border-radius: 10px;
   width: 240px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-popup);
   overflow: hidden;
 }
 
@@ -90,14 +90,14 @@ const popupY = computed(() => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  background: rgba(100, 200, 255, 0.15);
-  border-bottom: 1px solid rgba(160, 224, 255, 0.2);
+  background: var(--bg-accent-tint);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .popup-name {
   font-size: 14px;
   font-weight: 600;
-  color: #7ee6ff;
+  color: var(--text-accent);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -107,7 +107,7 @@ const popupY = computed(() => {
 .popup-close {
   background: none;
   border: none;
-  color: rgba(160, 224, 255, 0.6);
+  color: var(--text-close);
   cursor: pointer;
   font-size: 14px;
   padding: 0 4px;
@@ -115,7 +115,7 @@ const popupY = computed(() => {
 }
 
 .popup-close:hover {
-  color: #ff6b6b;
+  color: var(--text-close-hover);
 }
 
 .popup-body {
@@ -130,29 +130,29 @@ const popupY = computed(() => {
 }
 
 .popup-label {
-  color: rgba(160, 224, 255, 0.7);
+  color: var(--text-label);
   min-width: 40px;
   flex-shrink: 0;
 }
 
 .popup-value {
-  color: #daf2ff;
+  color: var(--text-primary);
 }
 
 .popup-detail-btn {
   display: block;
   width: 100%;
   padding: 8px;
-  background: rgba(100, 200, 255, 0.12);
+  background: var(--bg-accent-subtle);
   border: none;
-  border-top: 1px solid rgba(160, 224, 255, 0.15);
-  color: #7ee6ff;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-accent);
   font-size: 12px;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .popup-detail-btn:hover {
-  background: rgba(100, 200, 255, 0.25);
+  background: var(--bg-accent-subtle-hover);
 }
 </style>

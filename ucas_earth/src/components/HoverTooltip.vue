@@ -150,24 +150,24 @@ const formatValue = (key: string, value: unknown): string => {
 }
 
 .tooltip-content {
-  background: rgba(5, 25, 39, 0.95);
-  border: 1px solid rgba(160, 224, 255, 0.4);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-tooltip);
   border-radius: 8px;
   max-width: 320px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-popup);
   overflow: hidden;
 }
 
 .tooltip-header {
   padding: 8px 12px;
-  background: rgba(100, 200, 255, 0.15);
-  border-bottom: 1px solid rgba(160, 224, 255, 0.2);
+  background: var(--bg-accent-tint);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .building-name {
   font-size: 13px;
   font-weight: 600;
-  color: #7ee6ff;
+  color: var(--text-accent);
 }
 
 .tooltip-body {
@@ -179,7 +179,7 @@ const formatValue = (key: string, value: unknown): string => {
   gap: 8px;
   padding: 3px 0;
   font-size: 11px;
-  border-bottom: 1px solid rgba(160, 224, 255, 0.06);
+  border-bottom: 1px solid var(--border-faint);
 }
 
 .tooltip-row:last-child {
@@ -187,38 +187,38 @@ const formatValue = (key: string, value: unknown): string => {
 }
 
 .tooltip-row.highlight-row {
-  background: rgba(255, 204, 0, 0.08);
+  background: var(--bg-highlight-row);
   margin: 0 -12px;
   padding: 4px 12px;
-  border-bottom: 1px solid rgba(255, 204, 0, 0.15);
+  border-bottom: 1px solid var(--border-highlight);
 }
 
 .tooltip-key {
-  color: rgba(160, 224, 255, 0.7);
+  color: var(--text-label);
   min-width: 60px;
   flex-shrink: 0;
 }
 
 .highlight-row .tooltip-key {
-  color: rgba(255, 220, 100, 0.9);
+  color: var(--text-highlight-key);
 }
 
 .tooltip-value {
-  color: #daf2ff;
+  color: var(--text-primary);
   word-break: break-all;
 }
 
 .highlight-row .tooltip-value {
-  color: #fff;
+  color: var(--text-highlight-value);
   font-weight: 500;
 }
 
 .tooltip-hint {
   padding: 6px 12px;
-  background: rgba(100, 200, 255, 0.08);
-  border-top: 1px solid rgba(160, 224, 255, 0.15);
+  background: var(--bg-accent-subtle);
+  border-top: 1px solid var(--border-subtle);
   font-size: 10px;
-  color: rgba(160, 224, 255, 0.5);
+  color: var(--text-placeholder);
   text-align: center;
 }
 </style>

@@ -67,10 +67,10 @@ const formatCell = (value: unknown): string => {
 <style scoped>
 .property-table {
   width: 320px;
-  background: rgba(5, 25, 39, 0.95);
-  border: 1px solid rgba(160, 224, 255, 0.32);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-panel);
   display: flex;
   flex-direction: column;
   transition: width 0.2s ease;
@@ -86,21 +86,21 @@ const formatCell = (value: unknown): string => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border-bottom: 1px solid rgba(160, 224, 255, 0.15);
+  border-bottom: 1px solid var(--border-subtle);
   cursor: pointer;
   user-select: none;
   flex-shrink: 0;
 }
 
 .panel-header:hover {
-  background: rgba(32, 84, 124, 0.3);
+  background: var(--bg-hover);
   border-radius: 10px 10px 0 0;
 }
 
 .panel-title {
   font-size: 13px;
   font-weight: 600;
-  color: #daf2ff;
+  color: var(--text-primary);
 }
 
 .collapsed .panel-title {
@@ -109,7 +109,7 @@ const formatCell = (value: unknown): string => {
 
 .panel-arrow {
   font-size: 11px;
-  color: rgba(218, 242, 255, 0.7);
+  color: var(--text-secondary);
 }
 
 .panel-body {
@@ -127,8 +127,8 @@ const formatCell = (value: unknown): string => {
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
-  color: rgba(160, 224, 255, 0.9);
-  border-bottom: 1px solid rgba(160, 224, 255, 0.1);
+  color: var(--text-accent-strong);
+  border-bottom: 1px solid var(--border-divider);
   flex-shrink: 0;
 }
 
@@ -151,19 +151,19 @@ thead {
 }
 
 th {
-  background: rgba(23, 73, 108, 0.9);
-  color: #daf2ff;
+  background: var(--bg-table-header);
+  color: var(--text-primary);
   padding: 6px 8px;
   text-align: left;
   font-weight: 600;
   white-space: nowrap;
-  border-bottom: 1px solid rgba(160, 224, 255, 0.2);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 td {
   padding: 5px 8px;
-  color: rgba(218, 242, 255, 0.85);
-  border-bottom: 1px solid rgba(160, 224, 255, 0.08);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-faint);
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -171,20 +171,20 @@ td {
 }
 
 tr:hover td {
-  background: rgba(32, 84, 124, 0.4);
+  background: var(--bg-row-hover);
 }
 
 .row-num-col {
   width: 36px;
   text-align: center;
-  color: rgba(218, 242, 255, 0.4);
+  color: var(--text-row-num);
 }
 
 .table-footer {
   padding: 6px 12px;
   font-size: 11px;
-  color: rgba(190, 224, 243, 0.5);
-  border-top: 1px solid rgba(160, 224, 255, 0.1);
+  color: var(--text-footer);
+  border-top: 1px solid var(--border-divider);
   flex-shrink: 0;
 }
 
@@ -192,6 +192,6 @@ tr:hover td {
   padding: 24px 12px;
   text-align: center;
   font-size: 12px;
-  color: rgba(190, 224, 243, 0.6);
+  color: var(--text-muted);
 }
 </style>

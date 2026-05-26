@@ -669,10 +669,10 @@ onUnmounted(() => {
 	position: relative;
 	width: 100%;
 	height: 100%;
-	border: 1px solid rgba(167, 225, 255, 0.35);
+	border: 1px solid var(--border-viewer);
 	border-radius: 14px;
 	overflow: hidden;
-	box-shadow: 0 14px 32px rgba(0, 0, 0, 0.38);
+	box-shadow: var(--shadow-viewer);
 }
 
 #cesium_container {

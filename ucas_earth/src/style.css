@@ -6,6 +6,143 @@
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+
+	/* === Dark Theme (default) === */
+	--bg-app: radial-gradient(circle at 30% 0%, #1f4864 0%, #0a2332 45%, #06131d 100%);
+	--bg-panel: rgba(5, 25, 39, 0.95);
+	--bg-panel-solid: rgba(5, 25, 39, 0.98);
+	--bg-header: linear-gradient(110deg, rgba(0, 20, 38, 0.95), rgba(0, 48, 72, 0.85));
+	--bg-menu: rgba(7, 33, 54, 0.55);
+	--bg-menu-hover: rgba(18, 58, 89, 0.8);
+	--bg-btn: rgba(23, 73, 108, 0.86);
+	--bg-btn-hover: rgba(40, 105, 148, 0.92);
+	--bg-input: rgba(10, 35, 55, 0.8);
+	--bg-selected: rgba(40, 105, 148, 0.7);
+	--bg-hover: rgba(32, 84, 124, 0.3);
+	--bg-hover-strong: rgba(32, 84, 124, 0.5);
+	--bg-row-hover: rgba(32, 84, 124, 0.4);
+	--bg-table-header: rgba(23, 73, 108, 0.9);
+	--bg-cancel: rgba(30, 30, 30, 0.6);
+	--bg-cancel-hover: rgba(50, 50, 50, 0.8);
+	--bg-badge: rgba(10, 34, 56, 0.45);
+	--bg-overlay: rgba(0, 0, 0, 0.5);
+	--bg-highlight-row: rgba(255, 204, 0, 0.08);
+	--bg-accent-subtle: rgba(100, 200, 255, 0.12);
+	--bg-accent-subtle-hover: rgba(100, 200, 255, 0.25);
+	--bg-accent-tint: rgba(100, 200, 255, 0.15);
+	--bg-danger: rgba(118, 37, 37, 0.86);
+	--bg-danger-hover: rgba(155, 44, 44, 0.92);
+	--bg-close-hover: rgba(255, 255, 255, 0.1);
+
+	--text-primary: #daf2ff;
+	--text-secondary: rgba(218, 242, 255, 0.75);
+	--text-muted: rgba(190, 224, 243, 0.7);
+	--text-muted-strong: rgba(190, 224, 243, 0.88);
+	--text-label: rgba(160, 224, 255, 0.7);
+	--text-label-strong: rgba(160, 224, 255, 0.8);
+	--text-accent: #7ee6ff;
+	--text-accent-strong: rgba(160, 224, 255, 0.9);
+	--text-highlight-key: rgba(255, 220, 100, 0.9);
+	--text-highlight-value: #fff;
+	--text-row-num: rgba(218, 242, 255, 0.4);
+	--text-placeholder: rgba(160, 224, 255, 0.4);
+	--text-close: rgba(190, 224, 243, 0.7);
+	--text-close-hover: #ff6b6b;
+	--text-tip: rgba(190, 224, 243, 0.5);
+	--text-footer: rgba(190, 224, 243, 0.5);
+
+	--border-primary: rgba(160, 224, 255, 0.32);
+	--border-subtle: rgba(160, 224, 255, 0.15);
+	--border-divider: rgba(160, 224, 255, 0.1);
+	--border-faint: rgba(160, 224, 255, 0.06);
+	--border-input: rgba(160, 224, 255, 0.25);
+	--border-input-focus: rgba(100, 200, 255, 0.6);
+	--border-btn: rgba(160, 224, 255, 0.35);
+	--border-selected: rgba(160, 224, 255, 0.4);
+	--border-header: rgba(180, 229, 255, 0.25);
+	--border-menu: rgba(155, 217, 251, 0.22);
+	--border-menu-hover: rgba(175, 229, 255, 0.4);
+	--border-badge: rgba(140, 200, 237, 0.4);
+	--border-viewer: rgba(167, 225, 255, 0.35);
+	--border-highlight: rgba(255, 204, 0, 0.15);
+	--border-danger: rgba(253, 151, 151, 0.45);
+	--border-tooltip: rgba(160, 224, 255, 0.4);
+
+	--shadow-panel: 0 4px 16px rgba(0, 0, 0, 0.3);
+	--shadow-header: 0 4px 22px rgba(0, 0, 0, 0.35);
+	--shadow-viewer: 0 14px 32px rgba(0, 0, 0, 0.38);
+	--shadow-popup: 0 6px 24px rgba(0, 0, 0, 0.5);
+	--shadow-modal: 0 12px 40px rgba(0, 0, 0, 0.5);
+	--shadow-submenu: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] {
+	--bg-app: radial-gradient(circle at 30% 0%, #e8f0f8 0%, #dde8f2 45%, #d0dfe8 100%);
+	--bg-panel: rgba(255, 255, 255, 0.92);
+	--bg-panel-solid: rgba(255, 255, 255, 0.96);
+	--bg-header: linear-gradient(110deg, rgba(240, 248, 255, 0.96), rgba(225, 240, 252, 0.92));
+	--bg-menu: rgba(235, 244, 252, 0.7);
+	--bg-menu-hover: rgba(210, 232, 248, 0.9);
+	--bg-btn: rgba(190, 218, 240, 0.85);
+	--bg-btn-hover: rgba(160, 200, 230, 0.9);
+	--bg-input: rgba(240, 248, 255, 0.9);
+	--bg-selected: rgba(180, 215, 240, 0.7);
+	--bg-hover: rgba(200, 225, 245, 0.4);
+	--bg-hover-strong: rgba(190, 220, 245, 0.6);
+	--bg-row-hover: rgba(195, 222, 245, 0.5);
+	--bg-table-header: rgba(200, 225, 245, 0.85);
+	--bg-cancel: rgba(220, 220, 220, 0.6);
+	--bg-cancel-hover: rgba(200, 200, 200, 0.8);
+	--bg-badge: rgba(225, 240, 252, 0.6);
+	--bg-overlay: rgba(0, 0, 0, 0.25);
+	--bg-highlight-row: rgba(255, 204, 0, 0.12);
+	--bg-accent-subtle: rgba(40, 120, 180, 0.08);
+	--bg-accent-subtle-hover: rgba(40, 120, 180, 0.15);
+	--bg-accent-tint: rgba(40, 120, 180, 0.1);
+	--bg-danger: rgba(220, 80, 80, 0.15);
+	--bg-danger-hover: rgba(220, 80, 80, 0.25);
+	--bg-close-hover: rgba(0, 0, 0, 0.06);
+
+	--text-primary: #1a3a50;
+	--text-secondary: rgba(26, 58, 80, 0.7);
+	--text-muted: rgba(60, 100, 130, 0.7);
+	--text-muted-strong: rgba(60, 100, 130, 0.85);
+	--text-label: rgba(40, 80, 110, 0.7);
+	--text-label-strong: rgba(40, 80, 110, 0.85);
+	--text-accent: #0a7abf;
+	--text-accent-strong: rgba(30, 90, 140, 0.9);
+	--text-highlight-key: rgba(180, 120, 0, 0.9);
+	--text-highlight-value: #0a2a40;
+	--text-row-num: rgba(26, 58, 80, 0.35);
+	--text-placeholder: rgba(80, 120, 150, 0.5);
+	--text-close: rgba(60, 100, 130, 0.6);
+	--text-close-hover: #d44;
+	--text-tip: rgba(60, 100, 130, 0.5);
+	--text-footer: rgba(60, 100, 130, 0.5);
+
+	--border-primary: rgba(100, 160, 200, 0.35);
+	--border-subtle: rgba(100, 160, 200, 0.2);
+	--border-divider: rgba(100, 160, 200, 0.12);
+	--border-faint: rgba(100, 160, 200, 0.08);
+	--border-input: rgba(100, 160, 200, 0.3);
+	--border-input-focus: rgba(40, 120, 180, 0.6);
+	--border-btn: rgba(100, 160, 200, 0.4);
+	--border-selected: rgba(40, 120, 180, 0.5);
+	--border-header: rgba(100, 160, 200, 0.3);
+	--border-menu: rgba(100, 160, 200, 0.25);
+	--border-menu-hover: rgba(40, 120, 180, 0.4);
+	--border-badge: rgba(100, 160, 200, 0.4);
+	--border-viewer: rgba(100, 160, 200, 0.35);
+	--border-highlight: rgba(255, 180, 0, 0.25);
+	--border-danger: rgba(220, 80, 80, 0.45);
+	--border-tooltip: rgba(100, 160, 200, 0.4);
+
+	--shadow-panel: 0 4px 16px rgba(0, 40, 80, 0.1);
+	--shadow-header: 0 4px 22px rgba(0, 40, 80, 0.12);
+	--shadow-viewer: 0 14px 32px rgba(0, 40, 80, 0.12);
+	--shadow-popup: 0 6px 24px rgba(0, 40, 80, 0.15);
+	--shadow-modal: 0 12px 40px rgba(0, 40, 80, 0.18);
+	--shadow-submenu: 0 8px 20px rgba(0, 40, 80, 0.12);
 }
 
 * {

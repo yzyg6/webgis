@@ -42,10 +42,10 @@ const emit = defineEmits<{
 <style scoped>
 .layer-panel {
   width: 320px;
-  background: rgba(5, 25, 39, 0.95);
-  border: 1px solid rgba(160, 224, 255, 0.32);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-panel);
   display: flex;
   flex-direction: column;
   transition: width 0.2s ease;
@@ -60,20 +60,20 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border-bottom: 1px solid rgba(160, 224, 255, 0.15);
+  border-bottom: 1px solid var(--border-subtle);
   cursor: pointer;
   user-select: none;
 }
 
 .panel-header:hover {
-  background: rgba(32, 84, 124, 0.3);
+  background: var(--bg-hover);
   border-radius: 10px 10px 0 0;
 }
 
 .panel-title {
   font-size: 13px;
   font-weight: 600;
-  color: #daf2ff;
+  color: var(--text-primary);
 }
 
 .collapsed .panel-title {
@@ -82,7 +82,7 @@ const emit = defineEmits<{
 
 .panel-arrow {
   font-size: 11px;
-  color: rgba(218, 242, 255, 0.7);
+  color: var(--text-secondary);
 }
 
 .collapsed .panel-arrow {
@@ -103,7 +103,7 @@ const emit = defineEmits<{
   padding: 16px 8px;
   text-align: center;
   font-size: 12px;
-  color: rgba(190, 224, 243, 0.6);
+  color: var(--text-muted);
 }
 
 .layer-item {
@@ -117,17 +117,17 @@ const emit = defineEmits<{
 }
 
 .layer-item:hover {
-  background: rgba(32, 84, 124, 0.5);
+  background: var(--bg-hover-strong);
 }
 
 .layer-item.selected {
-  background: rgba(40, 105, 148, 0.7);
-  border: 1px solid rgba(160, 224, 255, 0.4);
+  background: var(--bg-selected);
+  border: 1px solid var(--border-selected);
 }
 
 .layer-name {
   font-size: 12px;
-  color: #daf2ff;
+  color: var(--text-primary);
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -136,7 +136,7 @@ const emit = defineEmits<{
 
 .layer-count {
   font-size: 11px;
-  color: rgba(218, 242, 255, 0.5);
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 </style>

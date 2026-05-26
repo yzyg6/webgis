@@ -504,7 +504,7 @@ onUnmounted(() => {
 	height: 100%;
 	display: grid;
 	grid-template-rows: 64px 1fr;
-	background: radial-gradient(circle at 30% 0%, #1f4864 0%, #0a2332 45%, #06131d 100%);
+	background: var(--bg-app);
 }
 
 .app-main {
