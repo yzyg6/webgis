@@ -46,6 +46,7 @@ const panelItems: PanelItem[] = [
   { id: 'layers', icon: '📋', label: '图层列表' },
   { id: 'building', icon: '🏫', label: '建筑信息' },
   { id: 'property', icon: '📊', label: '属性表' },
+  { id: 'course', icon: '📅', label: '课程表' },
 ];
 
 const tooltip = reactive({
