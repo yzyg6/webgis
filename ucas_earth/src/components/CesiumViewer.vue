@@ -233,7 +233,8 @@ const readBuildingHeight = (properties: Cesium.PropertyBag | undefined): number 
 		return DEFAULT_BUILDING_HEIGHT;
 	}
 
-	const height = parseHeightValue(values.Height);
+	// 优先检查 Height（大写），然后 height（小写）
+	const height = parseHeightValue(values.Height) || parseHeightValue(values.height);
 	if (height !== null) {
 		return height;
 	}
