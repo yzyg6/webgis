@@ -11,6 +11,7 @@ import type { GeoJsonLayerMeta } from "./types/geojson-db";
 import { getBuildingMeta, getAllBuildingMetas } from "./data/campus-buildings";
 import type { BuildingMeta } from "./data/campus-buildings";
 import { getBuildingType } from "./data/building-type-mapping";
+import { BUILDING_TYPE_LABELS } from "./types/building";
 import { createCourse, listCourses, updateCourse, deleteCourse, importCourses } from "./api/courses";
 import type { Course, CourseCreateInput, CourseImportRow } from "./types/courses";
 import { getCurrentWeek, getCurrentDay } from "./utils/weekRange";
@@ -602,7 +603,9 @@ onUnmounted(() => {
 			:visible="hoveredEntity !== null"
 			:x="hoveredEntity?.x ?? 0"
 			:y="hoveredEntity?.y ?? 0"
-			:properties="hoveredEntity?.properties ?? {}"
+			:building-name="String(hoveredEntity?.properties?.name || hoveredEntity?.properties?.Name || '')"
+			:building-type="BUILDING_TYPE_LABELS[getBuildingType(hoveredEntity?.properties ?? {})]"
+			:course-count="coursesByBuilding.get(String(hoveredEntity?.properties?.name || hoveredEntity?.properties?.Name || ''))?.length"
 		/>
 		<EditPanel
 			:visible="editingEntity !== null"
