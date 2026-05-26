@@ -8,21 +8,21 @@
   >
     <div class="popup-content">
       <div class="popup-header">
-        <span class="popup-name">{{ buildingName }}</span>
+        <div class="popup-header-info">
+          <span class="popup-name">{{ buildingName }}</span>
+          <span class="popup-type" v-if="buildingTypeLabel">{{ buildingTypeLabel }}</span>
+        </div>
         <button class="popup-close" @click="emit('close')">✕</button>
       </div>
       <div class="popup-body">
-        <div class="popup-row">
-          <span class="popup-label">用途</span>
-          <span class="popup-value">{{ purpose }}</span>
-        </div>
-        <div class="popup-row">
-          <span class="popup-label">楼层</span>
-          <span class="popup-value">{{ floors }} 层</span>
-        </div>
-        <div class="popup-row">
-          <span class="popup-label">容纳</span>
-          <span class="popup-value">{{ capacity }} 人</span>
+        <div class="popup-courses-header">今日课程</div>
+        <div v-if="courses.length === 0" class="popup-no-courses">暂无课程</div>
+        <div v-else class="popup-course-list">
+          <div v-for="course in courses" :key="course.id" class="popup-course-item">
+            <div class="popup-course-time">{{ course.startTime }}-{{ course.endTime }}</div>
+            <div class="popup-course-name">{{ course.name }}</div>
+            <div class="popup-course-meta">{{ course.classroom }}{{ course.teacher ? ' · ' + course.teacher : '' }}</div>
+          </div>
         </div>
       </div>
       <button class="popup-detail-btn" @click="emit('show-detail')">查看详情 →</button>
@@ -32,21 +32,27 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { Course } from '../types/courses';
+import type { BuildingType } from '../types/building';
+import { BUILDING_TYPE_LABELS } from '../types/building';
 
 const props = defineProps<{
   visible: boolean;
   x: number;
   y: number;
   buildingName: string;
-  purpose: string;
-  floors: number;
-  capacity: number;
+  buildingType?: BuildingType;
+  courses: Course[];
 }>();
 
 const emit = defineEmits<{
   'show-detail': [];
   close: [];
 }>();
+
+const buildingTypeLabel = computed(() => {
+  return props.buildingType ? BUILDING_TYPE_LABELS[props.buildingType] : '';
+});
 
 const popupX = computed(() => {
   const offset = 15;
@@ -104,6 +110,19 @@ const popupY = computed(() => {
   white-space: nowrap;
 }
 
+.popup-header-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.popup-type {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 .popup-close {
   background: none;
   border: none;
@@ -122,21 +141,51 @@ const popupY = computed(() => {
   padding: 8px 12px;
 }
 
-.popup-row {
-  display: flex;
-  gap: 8px;
-  padding: 4px 0;
-  font-size: 12px;
-}
-
-.popup-label {
+.popup-courses-header {
+  font-size: 11px;
   color: var(--text-label);
-  min-width: 40px;
-  flex-shrink: 0;
+  font-weight: 500;
+  margin-bottom: 6px;
 }
 
-.popup-value {
+.popup-no-courses {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 0;
+  text-align: center;
+}
+
+.popup-course-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.popup-course-item {
+  padding: 6px 8px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+}
+
+.popup-course-time {
+  font-size: 11px;
+  color: var(--text-accent);
+  font-weight: 500;
+}
+
+.popup-course-name {
+  font-size: 12px;
   color: var(--text-primary);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.popup-course-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
 }
 
 .popup-detail-btn {
