@@ -26,6 +26,19 @@
           :layer-name="layerName"
           :properties="properties"
         />
+        <CoursePanel
+          v-if="activePanel === 'course'"
+          :courses="courses"
+          :current-week="currentWeek"
+          :current-day="currentDay"
+          :buildings="courseBuildings"
+          @add="emit('addCourse')"
+          @edit="(course) => emit('editCourse', course)"
+          @delete="(id) => emit('deleteCourse', id)"
+          @import="emit('importCourses')"
+          @select="(course) => emit('selectCourse', course)"
+          @filter="(building) => emit('filterCourses', building)"
+        />
       </div>
     </div>
   </div>
@@ -36,7 +49,9 @@ import SidebarNav from './SidebarNav.vue';
 import LayerPanel from './LayerPanel.vue';
 import BuildingInfoPanel from './BuildingInfoPanel.vue';
 import PropertyTable from './PropertyTable.vue';
+import CoursePanel from './CoursePanel.vue';
 import type { BuildingMeta } from '../data/campus-buildings';
+import type { Course } from '../types/courses';
 
 type LayerMeta = {
   id: string;
@@ -54,6 +69,10 @@ defineProps<{
   geoProperties: Record<string, unknown>;
   layerName: string;
   properties: Record<string, unknown>[];
+  courses: Course[];
+  currentWeek: number;
+  currentDay: number;
+  courseBuildings: string[];
 }>();
 
 const emit = defineEmits<{
@@ -61,6 +80,12 @@ const emit = defineEmits<{
   selectLayer: [id: string];
   selectBuilding: [meta: BuildingMeta];
   'update:searchQuery': [query: string];
+  addCourse: [];
+  editCourse: [course: Course];
+  deleteCourse: [id: number];
+  importCourses: [];
+  selectCourse: [course: Course];
+  filterCourses: [buildingName: string];
 }>();
 </script>
 
