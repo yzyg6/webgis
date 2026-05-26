@@ -10,6 +10,7 @@ import { createLayer as dbCreateLayer, listLayers as dbListLayers, getLayer as d
 import type { GeoJsonLayerMeta } from "./types/geojson-db";
 import { getBuildingMeta, getAllBuildingMetas } from "./data/campus-buildings";
 import type { BuildingMeta } from "./data/campus-buildings";
+import { getBuildingType } from "./data/building-type-mapping";
 import { createCourse, listCourses, updateCourse, deleteCourse, importCourses } from "./api/courses";
 import type { Course, CourseCreateInput, CourseImportRow } from "./types/courses";
 import { getCurrentWeek, getCurrentDay } from "./utils/weekRange";
@@ -105,6 +106,12 @@ const coursesByBuilding = computed(() => {
 		}
 	}
 	return map;
+});
+
+const currentBuildingType = computed(() => {
+	if (!buildingPopupInfo.value) return undefined;
+	const properties = buildingPopupInfo.value.properties as Record<string, unknown>;
+	return getBuildingType(properties);
 });
 
 const handleSwitchLayer = (layer: BaseLayerType): void => {
@@ -586,9 +593,8 @@ onUnmounted(() => {
 			:x="buildingPopupInfo?.x ?? 0"
 			:y="buildingPopupInfo?.y ?? 0"
 			:building-name="String(buildingPopupInfo?.properties?.name || buildingPopupInfo?.properties?.Name || '')"
-			:purpose="String(buildingPopupInfo?.properties?.building || buildingPopupInfo?.properties?.purpose || '')"
-			:floors="Number(buildingPopupInfo?.properties?.['building:levels'] || buildingPopupInfo?.properties?.floors || 0)"
-			:capacity="Number(buildingPopupInfo?.properties?.capacity || 0)"
+			:building-type="currentBuildingType"
+			:courses="coursesByBuilding.get(String(buildingPopupInfo?.properties?.name || buildingPopupInfo?.properties?.Name || '')) ?? []"
 			@show-detail="handleShowBuildingDetail"
 			@close="buildingPopupInfo = null"
 		/>
