@@ -7,6 +7,7 @@
     <div class="tooltip-content">
       <div class="tooltip-header" v-if="buildingName">
         <span class="building-name">{{ buildingName }}</span>
+        <span class="tooltip-type" v-if="buildingType"> · {{ buildingType }}</span>
       </div>
       <div class="tooltip-body">
         <div
@@ -26,6 +27,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { getBuildingType } from '../data/building-type-mapping';
+import { BUILDING_TYPE_LABELS } from '../types/building';
 
 interface Props {
   visible: boolean;
@@ -79,6 +82,11 @@ const KEY_LABELS: Record<string, string> = {
 const buildingName = computed(() => {
   const name = props.properties.name || props.properties.Name;
   return name ? String(name) : null;
+});
+
+const buildingType = computed(() => {
+  const type = getBuildingType(props.properties as Record<string, unknown>);
+  return BUILDING_TYPE_LABELS[type];
 });
 
 const filteredProperties = computed(() => {
@@ -168,6 +176,12 @@ const formatValue = (key: string, value: unknown): string => {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-accent);
+}
+
+.tooltip-type {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: normal;
 }
 
 .tooltip-body {
