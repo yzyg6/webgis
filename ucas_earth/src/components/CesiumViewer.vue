@@ -9,6 +9,7 @@ import { markRaw, onMounted, onUnmounted, ref, toRaw, watch } from "vue";
 import * as Cesium from "cesium";
 import { getBuildingType } from '../data/building-type-mapping';
 import type { BuildingType } from '../types/building';
+import { RainEffect, SnowEffect, type WeatherType } from '../utils/weather-effects';
 
 type BaseLayerType = "osm" | "arcgis" | "carto";
 type GeoJsonObject = Record<string, unknown>;
@@ -60,12 +61,12 @@ const originalStyles = new Map<string, {
 }>();
 
 const DEFAULT_CENTER = {
-	lon: 115.778033,
-	lat: 32.886053,
-	height: 591.41,
-	heading: Cesium.Math.toRadians(12.200237),
-	pitch: Cesium.Math.toRadians(-43.867719),
-	roll: Cesium.Math.toRadians(0.001039),
+	lon: 115.785762,
+	lat: 32.898816,
+	height: 186.42,
+	heading: Cesium.Math.toRadians(225.178018),
+	pitch: Cesium.Math.toRadians(-16.644332),
+	roll: Cesium.Math.toRadians(359.999948),
 };
 
 const getBaseLayerProvider = (layerType: BaseLayerType): Cesium.ImageryProvider => {
@@ -490,6 +491,223 @@ const flyToBuildingByName = (name: string): boolean => {
 	return false;
 };
 
+const printCameraParams = (): void => {
+	const viewer = cesiumViewer.value;
+	if (!viewer || viewer.isDestroyed()) return;
+
+	const camera = viewer.camera;
+	const cartographic = camera.positionCartographic;
+	const lon = Cesium.Math.toDegrees(cartographic.longitude);
+	const lat = Cesium.Math.toDegrees(cartographic.latitude);
+	const height = cartographic.height;
+	const heading = Cesium.Math.toDegrees(camera.heading);
+	const pitch = Cesium.Math.toDegrees(camera.pitch);
+	const roll = Cesium.Math.toDegrees(camera.roll);
+
+	console.log('=== Cesium 相机视角参数 ===');
+	console.log(`lon: ${lon.toFixed(6)}`);
+	console.log(`lat: ${lat.toFixed(6)}`);
+	console.log(`height: ${height.toFixed(2)}`);
+	console.log(`heading: ${heading.toFixed(6)}`);
+	console.log(`pitch: ${pitch.toFixed(6)}`);
+	console.log(`roll: ${roll.toFixed(6)}`);
+	console.log('=== 复制用 ===');
+	console.log(`lon: ${lon.toFixed(6)},\nlat: ${lat.toFixed(6)},\nheight: ${height.toFixed(2)},\nheading: Cesium.Math.toRadians(${heading.toFixed(6)}),\npitch: Cesium.Math.toRadians(${pitch.toFixed(6)}),\nroll: Cesium.Math.toRadians(${roll.toFixed(6)},`);
+};
+
+let keyHandler: ((e: KeyboardEvent) => void) | null = null;
+let cameraBtnEl: HTMLButtonElement | null = null;
+let toastEl: HTMLDivElement | null = null;
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
+let weatherBtnEl: HTMLButtonElement | null = null;
+let weatherMenuEl: HTMLDivElement | null = null;
+let rainEffect: RainEffect | null = null;
+let snowEffect: SnowEffect | null = null;
+let currentWeather: WeatherType = "clear";
+let fogDensityBackup = 0;
+
+const showCameraToast = (text: string): void => {
+	if (toastEl) {
+		clearTimeout(toastTimer!);
+		toastEl.remove();
+		toastEl = null;
+	}
+
+	const viewer = cesiumViewer.value;
+	if (!viewer || viewer.isDestroyed()) return;
+
+	const container = viewer.container;
+	toastEl = document.createElement('div');
+	toastEl.className = 'camera-toast';
+	toastEl.textContent = text;
+	container.appendChild(toastEl);
+
+	toastTimer = setTimeout(() => {
+		toastEl?.remove();
+		toastEl = null;
+	}, 3000);
+};
+
+const handleCameraButtonClick = (): void => {
+	const viewer = cesiumViewer.value;
+	if (!viewer || viewer.isDestroyed()) return;
+
+	const camera = viewer.camera;
+	const cartographic = camera.positionCartographic;
+	const lon = Cesium.Math.toDegrees(cartographic.longitude);
+	const lat = Cesium.Math.toDegrees(cartographic.latitude);
+	const height = cartographic.height;
+	const heading = Cesium.Math.toDegrees(camera.heading);
+	const pitch = Cesium.Math.toDegrees(camera.pitch);
+	const roll = Cesium.Math.toDegrees(camera.roll);
+
+	console.log('=== Cesium 相机视角参数 ===');
+	console.log(`lon: ${lon.toFixed(6)}`);
+	console.log(`lat: ${lat.toFixed(6)}`);
+	console.log(`height: ${height.toFixed(2)}`);
+	console.log(`heading: ${heading.toFixed(6)}`);
+	console.log(`pitch: ${pitch.toFixed(6)}`);
+	console.log(`roll: ${roll.toFixed(6)}`);
+
+	const clipboardText = `lon: ${lon.toFixed(6)},\nlat: ${lat.toFixed(6)},\nheight: ${height.toFixed(2)},\nheading: Cesium.Math.toRadians(${heading.toFixed(6)}),\npitch: Cesium.Math.toRadians(${pitch.toFixed(6)}),\nroll: Cesium.Math.toRadians(${roll.toFixed(6)}),`;
+
+	const toastText = `lon: ${lon.toFixed(6)}\nlat: ${lat.toFixed(6)}\nheight: ${height.toFixed(2)}\nheading: ${heading.toFixed(6)}°\npitch: ${pitch.toFixed(6)}°\nroll: ${roll.toFixed(6)}°\n✓ 已复制到剪贴板`;
+
+	navigator.clipboard.writeText(clipboardText).catch(() => {
+		/* clipboard may fail in some contexts */
+	});
+
+	showCameraToast(toastText);
+};
+
+const injectCameraButton = (): void => {
+	const viewer = cesiumViewer.value;
+	if (!viewer || viewer.isDestroyed()) return;
+
+	const toolbar = viewer.container.querySelector('.cesium-viewer-toolbar');
+	if (!toolbar) return;
+
+	cameraBtnEl = document.createElement('button');
+	cameraBtnEl.className = 'cesium-button cesium-toolbar-button camera-params-btn';
+	cameraBtnEl.title = '获取相机参数';
+	cameraBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+	cameraBtnEl.addEventListener('click', handleCameraButtonClick);
+	toolbar.insertBefore(cameraBtnEl, toolbar.firstChild);
+};
+
+const WEATHER_LABELS: Record<WeatherType, string> = {
+	clear: "☀️ 晴天",
+	rain: "🌧️ 雨天",
+	snow: "❄️ 雪天",
+	fog: "🌫️ 雾天",
+};
+
+const applyWeather = (type: WeatherType): void => {
+	const viewer = cesiumViewer.value;
+	if (!viewer || viewer.isDestroyed()) return;
+
+	currentWeather = type;
+
+	// 关闭所有天气效果
+	rainEffect?.show(false);
+	snowEffect?.show(false);
+	viewer.scene.fog.enabled = false;
+	viewer.scene.fog.density = fogDensityBackup;
+
+	switch (type) {
+		case "rain":
+			if (!rainEffect) rainEffect = new RainEffect(viewer);
+			rainEffect.show(true);
+			break;
+		case "snow":
+			if (!snowEffect) snowEffect = new SnowEffect(viewer);
+			snowEffect.show(true);
+			break;
+		case "fog":
+			viewer.scene.fog.enabled = true;
+			viewer.scene.fog.density = 0.002;
+			break;
+	}
+
+	// 更新菜单高亮
+	if (weatherMenuEl) {
+		const items = weatherMenuEl.querySelectorAll('.weather-menu-item');
+		items.forEach((item) => {
+			const el = item as HTMLElement;
+			el.style.background = el.dataset.weather === type ? 'rgba(64,158,255,0.3)' : 'transparent';
+		});
+	}
+};
+
+const toggleWeatherMenu = (): void => {
+	if (weatherMenuEl) {
+		weatherMenuEl.style.display = weatherMenuEl.style.display === 'none' ? 'block' : 'none';
+	}
+};
+
+const injectWeatherButton = (): void => {
+	const viewer = cesiumViewer.value;
+	if (!viewer || viewer.isDestroyed()) return;
+
+	const toolbar = viewer.container.querySelector('.cesium-viewer-toolbar');
+	if (!toolbar) return;
+
+	// 天气按钮
+	weatherBtnEl = document.createElement('button');
+	weatherBtnEl.className = 'cesium-button cesium-toolbar-button';
+	weatherBtnEl.title = '天气模拟';
+	weatherBtnEl.innerHTML = '🌤️';
+	weatherBtnEl.style.fontSize = '16px';
+	weatherBtnEl.addEventListener('click', toggleWeatherMenu);
+
+	// 下拉菜单
+	weatherMenuEl = document.createElement('div');
+	weatherMenuEl.className = 'weather-menu';
+	weatherMenuEl.style.cssText = `
+		display: none;
+		position: absolute;
+		right: 40px;
+		top: 0;
+		background: rgba(0,0,0,0.85);
+		border-radius: 6px;
+		padding: 4px 0;
+		z-index: 999;
+		min-width: 100px;
+	`;
+
+	(Object.keys(WEATHER_LABELS) as WeatherType[]).forEach((type) => {
+		const item = document.createElement('div');
+		item.className = 'weather-menu-item';
+		item.dataset.weather = type;
+		item.textContent = WEATHER_LABELS[type];
+		item.style.cssText = `
+			padding: 8px 14px;
+			color: #fff;
+			font-size: 13px;
+			cursor: pointer;
+			background: ${type === currentWeather ? 'rgba(64,158,255,0.3)' : 'transparent'};
+		`;
+		item.addEventListener('mouseenter', () => { item.style.background = 'rgba(64,158,255,0.5)'; });
+		item.addEventListener('mouseleave', () => { item.style.background = type === currentWeather ? 'rgba(64,158,255,0.3)' : 'transparent'; });
+		item.addEventListener('click', () => {
+			applyWeather(type);
+			weatherMenuEl!.style.display = 'none';
+		});
+		weatherMenuEl!.appendChild(item);
+	});
+
+	// 关闭菜单
+	const closeMenu = (e: MouseEvent): void => {
+		if (weatherMenuEl && !weatherMenuEl.contains(e.target as Node) && e.target !== weatherBtnEl) {
+			weatherMenuEl.style.display = 'none';
+		}
+	};
+	document.addEventListener('click', closeMenu);
+
+	toolbar.insertBefore(weatherMenuEl, toolbar.firstChild);
+	toolbar.insertBefore(weatherBtnEl, weatherMenuEl);
+};
+
 const updateBuildingHeight = (layerId: string, featureIndex: number, height: number): void => {
 	const dataSource = cityModelDataSources.get(layerId);
 	if (!dataSource) return;
@@ -648,6 +866,8 @@ const setupMouseHandlers = (): void => {
 };
 
 onMounted(async () => {
+	Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
+
 	cesiumViewer.value = markRaw(new Cesium.Viewer("cesium_container", {
 		baseLayer: false,
 		terrainProvider: new Cesium.EllipsoidTerrainProvider(),
@@ -665,10 +885,24 @@ onMounted(async () => {
 		navigationInstructionsInitiallyVisible: true,
 	}));
 
+	// 光照与阴影
+	cesiumViewer.value.scene.globe.enableLighting = true;
+	cesiumViewer.value.shadows = true;
+	cesiumViewer.value.terrainShadows = Cesium.ShadowMode.ENABLED;
+
+	// 设置时间为上午 10 点以获得适合的光照角度
+	const startTime = Cesium.JulianDate.fromDate(new Date(2026, 4, 28, 10, 0, 0));
+	cesiumViewer.value.clock.startTime = startTime.clone();
+	cesiumViewer.value.clock.currentTime = startTime.clone();
+	cesiumViewer.value.clock.clockRange = Cesium.ClockRange.UNBOUNDED;
+
 	applyBaseLayer(props.baseLayer);
 	applyDefaultView(0);
 	await syncCityModelLayers();
 	setupMouseHandlers();
+	injectCameraButton();
+	injectWeatherButton();
+	fogDensityBackup = cesiumViewer.value.scene.fog.density;
 
 	if (cesiumViewer.value.homeButton) {
 		cesiumViewer.value.homeButton.viewModel.command.beforeExecute.addEventListener((event) => {
@@ -676,6 +910,14 @@ onMounted(async () => {
 			applyDefaultView(1.2);
 		});
 	}
+
+	// 按 P 键打印相机参数
+	keyHandler = (e: KeyboardEvent) => {
+		if (e.key === 'p' || e.key === 'P') {
+			printCameraParams();
+		}
+	};
+	window.addEventListener('keydown', keyHandler);
 });
 
 onUnmounted(() => {
@@ -698,6 +940,35 @@ onUnmounted(() => {
 	if (clickTimer !== null) {
 		clearTimeout(clickTimer);
 		clickTimer = null;
+	}
+	if (keyHandler) {
+		window.removeEventListener('keydown', keyHandler);
+		keyHandler = null;
+	}
+	if (cameraBtnEl) {
+		cameraBtnEl.removeEventListener('click', handleCameraButtonClick);
+		cameraBtnEl.remove();
+		cameraBtnEl = null;
+	}
+	if (toastTimer !== null) {
+		clearTimeout(toastTimer);
+		toastTimer = null;
+	}
+	if (toastEl) {
+		toastEl.remove();
+		toastEl = null;
+	}
+	rainEffect?.destroy();
+	rainEffect = null;
+	snowEffect?.destroy();
+	snowEffect = null;
+	if (weatherBtnEl) {
+		weatherBtnEl.remove();
+		weatherBtnEl = null;
+	}
+	if (weatherMenuEl) {
+		weatherMenuEl.remove();
+		weatherMenuEl = null;
 	}
 	if (cesiumViewer.value) {
 		for (const dataSource of cityModelDataSources.values()) {
@@ -724,5 +995,34 @@ onUnmounted(() => {
 #cesium_container {
 	width: 100%;
 	height: 100%;
+}
+
+.camera-params-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 4px;
+}
+
+.camera-toast {
+	position: absolute;
+	top: 10px;
+	right: 40px;
+	z-index: 999;
+	background: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	padding: 10px 14px;
+	border-radius: 6px;
+	font-family: monospace;
+	font-size: 12px;
+	line-height: 1.6;
+	white-space: pre;
+	pointer-events: none;
+	animation: camera-toast-in 0.2s ease-out;
+}
+
+@keyframes camera-toast-in {
+	from { opacity: 0; transform: translateY(-8px); }
+	to { opacity: 1; transform: translateY(0); }
 }
 </style>
