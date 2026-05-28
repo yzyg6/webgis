@@ -1,12 +1,33 @@
 // 火星相关常量和配置
 
+// --- 类型定义 ---
+
+/** RGB 系数三元组 [R, G, B] */
+type CoefficientTuple = [number, number, number]
+
+/** Cesium NearFarScalar 配置 */
+export interface NearFarScalar {
+  near: number
+  nearValue: number
+  far: number
+  farValue: number
+}
+
+/** 火星车信息 */
+export interface Rover {
+  id: string
+  name: string
+  startSol?: number
+  description: string
+}
+
 // Cesium Ion 资产 ID
 export const MARS_ION_ASSET_ID = 3644333
 
 // 火星大气配置
 export const MARS_ATMOSPHERE = {
-  mieCoefficient: [9.0e-5, 2.0e-5, 1.0e-5],
-  rayleighCoefficient: [9.0e-6, 2.0e-6, 1.0e-6],
+  mieCoefficient: [9.0e-5, 2.0e-5, 1.0e-5] as CoefficientTuple,
+  rayleighCoefficient: [9.0e-6, 2.0e-6, 1.0e-6] as CoefficientTuple,
   rayleighScaleHeight: 9000,
   mieScaleHeight: 2700,
   saturationShift: -0.1,
@@ -24,7 +45,7 @@ export const MARS_POST_PROCESS = {
 }
 
 // 火星车配置
-export const MARS_ROVERS = [
+export const MARS_ROVERS: Rover[] = [
   {
     id: 'Curiosity',
     name: '好奇号',
@@ -59,21 +80,22 @@ export const MARS_LANDMARKS_PATH = '/data/mars/MarsPointsOfInterest.geojson'
 export const MARS_INITIAL_VIEW = {
   longitude: 137.4,
   latitude: -4.5,
-  height: 10000000,
+  height: 10000000, // 高度，单位：米（约 10,000 km）
 }
 
 // Sol 日期转换常量
+// 1 Sol = 24h 39m 35s ≈ 88,775 秒
 export const SECONDS_PER_SOL = 24 * 60 * 60 + 39 * 60 + 35
 
 // 轨迹宽度配置
-export const ROVER_PATH_WIDTH = {
+export const ROVER_PATH_WIDTH: NearFarScalar = {
   near: 0.0,
   nearValue: 15.0,
   far: 1.0e5,
   farValue: 0.0,
 }
 
-export const MARTIAN_JOURNEY_WIDTH = {
+export const MARTIAN_JOURNEY_WIDTH: NearFarScalar = {
   near: 0.0,
   nearValue: 10.0,
   far: 1.0e7,
