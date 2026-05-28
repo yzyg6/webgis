@@ -76,3 +76,7 @@ tmp/
 # Uncomment if you want to ignore large GeoJSON files
 # data/*.geojson
 # data/FUYANG_Building.geojson
+
+# External reference repos
+cesium-vue3-vite/
+ucas_earth/src/env.d.ts
