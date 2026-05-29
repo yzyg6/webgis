@@ -156,9 +156,12 @@ onMounted(async () => {
       ctx.font = '36px sans-serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.strokeStyle = 'rgba(0,0,0,0.1)'
-      ctx.lineWidth = 1
-      ctx.fillStyle = '#ffffff'
+      const isLight = document.documentElement.dataset.theme === 'light'
+      const textColor = isLight ? '#1e293b' : '#ffffff'
+      const strokeColor = isLight ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'
+      ctx.strokeStyle = strokeColor
+      ctx.lineWidth = 2
+      ctx.fillStyle = textColor
       ctx.strokeText(text, canvas.width / 2, canvas.height / 2)
       ctx.fillText(text, canvas.width / 2, canvas.height / 2)
       return canvas
@@ -170,7 +173,7 @@ onMounted(async () => {
       const zhDesc = LANDMARK_DESC_ZH[name] || entity.properties!.description.getValue()
       return `<img width="50%" style="float:left; margin: 0 1em 1em 0;" src=${entity.properties!.imageURL}>` +
         `<p><strong>${zhName}</strong></p><p>${zhDesc}</p>` +
-        `<p>来源: <a style="color: white" target="_blank" href="${entity.properties!.sourceURL}">${entity.properties!.source}</a></p>`
+        `<p>来源: <a target="_blank" href="${entity.properties!.sourceURL}">${entity.properties!.source}</a></p>`
     }
 
     // 状态管理
@@ -426,6 +429,200 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   min-height: 0;
+}
+
+/* === Cesium 控件主题适配 === */
+
+/* 暗色模式（默认）：浅色控件 */
+:deep(.cesium-timeline-main) {
+  background: rgba(13, 17, 23, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 6px;
+}
+
+:deep(.cesium-timeline-ticLabel) {
+  color: rgba(226, 232, 240, 0.8);
+  text-shadow: none;
+}
+
+:deep(.cesium-timeline-bar) {
+  background: rgba(48, 58, 72, 0.8);
+}
+
+:deep(.cesium-timeline-highlight) {
+  background: rgba(232, 171, 56, 0.5);
+}
+
+:deep(.cesium-animation-theme) svg text {
+  fill: #e2e8f0;
+}
+
+:deep(.cesium-animation-svgText) {
+  fill: #e2e8f0;
+}
+
+:deep(.cesium-animation-rectButton) rect {
+  fill: rgba(35, 43, 55, 0.85);
+  stroke: rgba(148, 163, 184, 0.3);
+}
+
+:deep(.cesium-animation-rectButton:hover) rect {
+  fill: rgba(48, 58, 72, 0.9);
+}
+
+:deep(.cesium-animation-button) {
+  color: #e2e8f0;
+}
+
+:deep(.cesium-animation-shuttleRingOuter) {
+  fill: rgba(35, 43, 55, 0.85);
+  stroke: rgba(148, 163, 184, 0.25);
+}
+
+:deep(.cesium-animation-shuttleRingSwoop) {
+  stroke: rgba(232, 171, 56, 0.6);
+}
+
+:deep(.cesium-animation-knobOuter) {
+  fill: rgba(232, 171, 56, 0.8);
+}
+
+:deep(.cesium-viewer-toolbar .cesium-button) {
+  background: rgba(13, 17, 23, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
+  fill: #e2e8f0;
+}
+
+:deep(.cesium-viewer-toolbar .cesium-button:hover) {
+  background: rgba(35, 43, 55, 0.95);
+}
+
+:deep(.cesium-viewer-toolbar .cesium-button svg) {
+  fill: #e2e8f0;
+  stroke: #e2e8f0;
+}
+
+:deep(.cesium-infoBox) {
+  background: rgba(13, 17, 23, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}
+
+:deep(.cesium-infoBox-title) {
+  background: rgba(22, 28, 36, 0.95);
+  color: #e2e8f0;
+}
+
+:deep(.cesium-infoBox-body) {
+  color: rgba(226, 232, 240, 0.9);
+}
+
+:deep(.cesium-infoBox-body a) {
+  color: #e8ab38;
+}
+
+:deep(.cesium-infoBox-close) {
+  fill: rgba(148, 163, 184, 0.7);
+}
+
+:deep(.cesium-infoBox-close:hover) {
+  fill: #f87171;
+}
+
+/* 亮色模式：深色控件 */
+:root[data-theme="light"] :deep(.cesium-timeline-main) {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(100, 116, 139, 0.25);
+}
+
+:root[data-theme="light"] :deep(.cesium-timeline-ticLabel) {
+  color: rgba(30, 41, 59, 0.85);
+}
+
+:root[data-theme="light"] :deep(.cesium-timeline-bar) {
+  background: rgba(203, 210, 220, 0.8);
+}
+
+:root[data-theme="light"] :deep(.cesium-timeline-highlight) {
+  background: rgba(180, 122, 10, 0.4);
+}
+
+:root[data-theme="light"] :deep(.cesium-animation-theme) svg text {
+  fill: #1e293b;
+}
+
+:root[data-theme="light"] :deep(.cesium-animation-svgText) {
+  fill: #1e293b;
+}
+
+:root[data-theme="light"] :deep(.cesium-animation-rectButton) rect {
+  fill: rgba(224, 228, 235, 0.9);
+  stroke: rgba(100, 116, 139, 0.3);
+}
+
+:root[data-theme="light"] :deep(.cesium-animation-rectButton:hover) rect {
+  fill: rgba(203, 210, 220, 0.95);
+}
+
+:root[data-theme="light"] :deep(.cesium-animation-button) {
+  color: #1e293b;
+}
+
+:root[data-theme="light"] :deep(.cesium-animation-shuttleRingOuter) {
+  fill: rgba(224, 228, 235, 0.9);
+  stroke: rgba(100, 116, 139, 0.3);
+}
+
+:root[data-theme="light"] :deep(.cesium-animation-shuttleRingSwoop) {
+  stroke: rgba(180, 122, 10, 0.6);
+}
+
+:root[data-theme="light"] :deep(.cesium-animation-knobOuter) {
+  fill: rgba(180, 122, 10, 0.8);
+}
+
+:root[data-theme="light"] :deep(.cesium-viewer-toolbar .cesium-button) {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(100, 116, 139, 0.25);
+  color: #1e293b;
+  fill: #1e293b;
+}
+
+:root[data-theme="light"] :deep(.cesium-viewer-toolbar .cesium-button:hover) {
+  background: rgba(240, 242, 245, 0.98);
+}
+
+:root[data-theme="light"] :deep(.cesium-viewer-toolbar .cesium-button svg) {
+  fill: #1e293b;
+  stroke: #1e293b;
+}
+
+:root[data-theme="light"] :deep(.cesium-infoBox) {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(100, 116, 139, 0.25);
+  color: #1e293b;
+}
+
+:root[data-theme="light"] :deep(.cesium-infoBox-title) {
+  background: rgba(240, 242, 245, 0.98);
+  color: #1e293b;
+}
+
+:root[data-theme="light"] :deep(.cesium-infoBox-body) {
+  color: rgba(30, 41, 59, 0.9);
+}
+
+:root[data-theme="light"] :deep(.cesium-infoBox-body a) {
+  color: #b47a0a;
+}
+
+:root[data-theme="light"] :deep(.cesium-infoBox-close) {
+  fill: rgba(100, 116, 139, 0.7);
+}
+
+:root[data-theme="light"] :deep(.cesium-infoBox-close:hover) {
+  fill: #dc2626;
 }
 
 /* 动画高亮 */

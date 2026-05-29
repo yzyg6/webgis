@@ -4,7 +4,33 @@ import * as Cesium from 'cesium'
 import Header from '../components/Header.vue'
 
 const cesiumContainer = ref<HTMLDivElement | null>(null)
+const searchQuery = ref('')
 let viewer: Cesium.Viewer | null = null
+
+const searchCity = async () => {
+  if (!viewer || !searchQuery.value.trim()) return
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery.value.trim())}&format=json&limit=1`,
+      { headers: { 'Accept-Language': 'zh-CN' } }
+    )
+    const data = await res.json()
+    if (data.length > 0) {
+      const { lat, lon, display_name } = data[0]
+      viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(parseFloat(lon), parseFloat(lat), 500000),
+        orientation: {
+          heading: 0,
+          pitch: Cesium.Math.toRadians(-45),
+          roll: 0,
+        },
+        duration: 2,
+      })
+    }
+  } catch (e) {
+    console.warn('搜索失败:', e)
+  }
+}
 
 onMounted(async () => {
   if (!cesiumContainer.value) return
@@ -16,12 +42,14 @@ onMounted(async () => {
       baseLayer: false,
       baseLayerPicker: false,
       geocoder: false,
-      timeline: true,
-      animation: true,
+      timeline: false,
+      animation: false,
+      sceneModePicker: false,
+      navigationHelpButton: false,
     }),
   )
 
-  // 默认加载卫星底图
+  // 加载卫星底图
   viewer.imageryLayers.addImageryProvider(
     new Cesium.UrlTemplateImageryProvider({
       url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
@@ -31,10 +59,37 @@ onMounted(async () => {
     }),
   )
 
+  // 加载地形
+  try {
+    viewer.terrainProvider = await Cesium.CesiumTerrainProvider.fromIonAssetId(1)
+    viewer.scene.globe.depthTestAgainstTerrain = true
+  } catch (e) {
+    console.warn('地形加载失败:', e)
+  }
+
+  // 加载 OSM Buildings
+  try {
+    const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(96188)
+    viewer.scene.primitives.add(tileset)
+    await viewer.zoomTo(tileset)
+
+    // 应用默认样式
+    const extras = tileset.asset.extras
+    if (
+      Cesium.defined(extras) &&
+      Cesium.defined((extras as any).ion) &&
+      Cesium.defined((extras as any).ion.defaultStyle)
+    ) {
+      tileset.style = new Cesium.Cesium3DTileStyle((extras as any).ion.defaultStyle)
+    }
+  } catch (e) {
+    console.warn('OSM Buildings 加载失败:', e)
+  }
+
   // 飞到中国上空
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(116.4, 39.9, 5000000),
-    duration: 2,
+    duration: 0,
   })
 })
 
@@ -48,6 +103,16 @@ onUnmounted(() => {
   <div class="city-view">
     <Header mode="city" />
     <div class="city-main">
+      <div class="search-box">
+        <input
+          v-model="searchQuery"
+          class="search-input"
+          type="text"
+          placeholder="搜索城市..."
+          @keydown.enter="searchCity"
+        />
+        <button class="search-btn" @click="searchCity">搜索</button>
+      </div>
       <div ref="cesiumContainer" class="cesium-container"></div>
     </div>
   </div>
@@ -63,11 +128,53 @@ onUnmounted(() => {
 
 .city-main {
   min-height: 0;
+  position: relative;
 }
 
 .cesium-container {
   width: 100%;
   height: 100%;
   min-height: 0;
+}
+
+.search-box {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  display: flex;
+  gap: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.search-input {
+  padding: 8px 14px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 220px;
+  background: var(--bg-panel-solid);
+  color: var(--text-primary);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-btn {
+  padding: 8px 16px;
+  border: none;
+  background: var(--text-accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-btn:hover {
+  filter: brightness(1.1);
 }
 </style>
