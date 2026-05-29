@@ -866,12 +866,14 @@ const setupMouseHandlers = (): void => {
 };
 
 onMounted(async () => {
+	// 确保使用地球椭球（火星页面可能修改了默认值）
+	Cesium.Ellipsoid.default = Cesium.Ellipsoid.WGS84;
 	Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
 	cesiumViewer.value = markRaw(new Cesium.Viewer("cesium_container", {
 		baseLayer: false,
 		terrainProvider: new Cesium.EllipsoidTerrainProvider(),
-		baseLayerPicker: true,
+		baseLayerPicker: false,
 		geocoder: false,
 		homeButton: true,
 		sceneModePicker: true,

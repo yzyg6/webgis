@@ -14,6 +14,12 @@ const routes = [
 		component: () => import('../views/CampusView.vue'),
 		meta: { title: 'FYUN 校园系统', activePath: '/campus' },
 	},
+	{
+		path: '/mars',
+		name: 'mars',
+		component: () => import('../views/MarsView.vue'),
+		meta: { title: '火星探索', activePath: '/mars' },
+	},
 ]
 
 const router = createRouter({

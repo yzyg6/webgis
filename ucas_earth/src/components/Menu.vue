@@ -10,6 +10,7 @@ const activePath = ref(route.meta.activePath as string || '/')
 const menuItems = [
 	{ index: '/', title: '首页', icon: '⌂' },
 	{ index: '/campus', title: '校园展示', icon: '◈' },
+	{ index: '/mars', title: '火星探索', icon: '◉' },
 ]
 
 const onExpand = () => {
