@@ -2,7 +2,7 @@
 import CesiumViewer from '../components/CesiumViewer.vue'
 import { ref } from 'vue'
 
-const currentBaseLayer = ref<'osm' | 'arcgis' | 'carto'>('osm')
+const currentBaseLayer = ref<'osm' | 'arcgis' | 'carto' | 'google-satellite'>('osm')
 </script>
 
 <template>

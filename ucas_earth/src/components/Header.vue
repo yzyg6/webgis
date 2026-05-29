@@ -23,6 +23,10 @@
             <span class="submenu-icon">📝</span>
             <span class="submenu-label">Carto Light</span>
           </button>
+          <button class="submenu-item" type="button" @click="emitSwitchLayer('google-satellite')">
+            <span class="submenu-icon">🛰️</span>
+            <span class="submenu-label">Google Satellite</span>
+          </button>
         </div>
       </div>
 

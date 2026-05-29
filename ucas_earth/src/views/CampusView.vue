@@ -19,7 +19,7 @@ import CourseForm from "../components/CourseForm.vue";
 import CourseImport from "../components/CourseImport.vue";
 import CourseDetail from "../components/CourseDetail.vue";
 
-type BaseLayerType = "osm" | "arcgis" | "carto";
+type BaseLayerType = "osm" | "arcgis" | "carto" | "google-satellite";
 type GeoJsonObject = Record<string, unknown>;
 
 type CityLayer = {

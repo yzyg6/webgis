@@ -11,7 +11,7 @@ import { getBuildingType } from '../data/building-type-mapping';
 import type { BuildingType } from '../types/building';
 import { RainEffect, SnowEffect, type WeatherType } from '../utils/weather-effects';
 
-type BaseLayerType = "osm" | "arcgis" | "carto";
+type BaseLayerType = "osm" | "arcgis" | "carto" | "google-satellite";
 type GeoJsonObject = Record<string, unknown>;
 type CityLayer = {
 	id: string;
@@ -79,6 +79,15 @@ const getBaseLayerProvider = (layerType: BaseLayerType): Cesium.ImageryProvider 
 	if (layerType === "carto") {
 		return new Cesium.UrlTemplateImageryProvider({
 			url: "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+		});
+	}
+
+	if (layerType === "google-satellite") {
+		return new Cesium.UrlTemplateImageryProvider({
+			url: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+			tileWidth: 256,
+			tileHeight: 256,
+			maximumLevel: 20,
 		});
 	}
 
