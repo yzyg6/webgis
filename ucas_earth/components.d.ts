@@ -24,6 +24,7 @@ declare module 'vue' {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HoverTooltip: typeof import('./src/components/HoverTooltip.vue')['default']
     LayerPanel: typeof import('./src/components/LayerPanel.vue')['default']
+    MarsFlightPanel: typeof import('./src/components/mars/MarsFlightPanel.vue')['default']
     Menu: typeof import('./src/components/Menu.vue')['default']
     PropertyTable: typeof import('./src/components/PropertyTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

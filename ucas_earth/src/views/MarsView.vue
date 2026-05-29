@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { markRaw, nextTick, onMounted, onUnmounted, ref, reactive } from 'vue'
 import * as Cesium from 'cesium'
+import Header from '../components/Header.vue'
+import MarsFlightPanel from '../components/mars/MarsFlightPanel.vue'
 
 // === 中文翻译映射 ===
 const ROVER_NAMES: Record<string, string> = {
@@ -64,6 +66,22 @@ let flyToLandmark: ((key: string) => void) | null = null
 const closeAll = () => {
   roverMenuOpen.value = false
   landmarkMenuOpen.value = false
+}
+
+const selectedRoverId = ref<string | null>(null)
+const selectedLandmarkKey = ref<string | null>(null)
+const currentSol = ref<number | null>(null)
+
+const handleSelectRover = (id: string) => {
+  selectedRoverId.value = id
+  selectedLandmarkKey.value = null
+  flyToRover?.(id)
+}
+
+const handleSelectLandmark = (key: string) => {
+  selectedLandmarkKey.value = key
+  selectedRoverId.value = null
+  flyToLandmark?.(key)
 }
 
 onMounted(async () => {
@@ -367,199 +385,47 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="mars-view" @click="closeAll">
-    <div ref="cesiumContainer" class="cesium-container"></div>
-
-    <!-- Cesium 风格工具栏 -->
-    <div class="mars-toolbar">
-      <!-- 火星车下拉 -->
-      <div class="toolbar-btn" @click.stop>
-        <button class="cesium-btn" @click="roverMenuOpen = !roverMenuOpen; landmarkMenuOpen = false">
-          <span class="btn-icon">🚗</span>
-          <span class="btn-text">火星车</span>
-          <span class="btn-arrow" :class="{ open: roverMenuOpen }">▾</span>
-        </button>
-        <transition name="dropdown">
-          <div v-if="roverMenuOpen" class="dropdown-panel">
-            <button
-              v-for="item in roverItems"
-              :key="item.id"
-              class="dropdown-item"
-              @click="flyToRover?.(item.id)"
-            >
-              <span class="item-dot"></span>
-              {{ item.name }}
-            </button>
-          </div>
-        </transition>
-      </div>
-
-      <!-- 地标下拉 -->
-      <div class="toolbar-btn" @click.stop>
-        <button class="cesium-btn" @click="landmarkMenuOpen = !landmarkMenuOpen; roverMenuOpen = false">
-          <span class="btn-icon">📍</span>
-          <span class="btn-text">火星地标</span>
-          <span class="btn-arrow" :class="{ open: landmarkMenuOpen }">▾</span>
-        </button>
-        <transition name="dropdown">
-          <div v-if="landmarkMenuOpen" class="dropdown-panel landmark-panel">
-            <button
-              v-for="item in landmarkItems"
-              :key="item.key"
-              class="dropdown-item"
-              @click="flyToLandmark?.(item.key)"
-            >
-              <span class="item-dot landmark-dot"></span>
-              {{ item.name }}
-            </button>
-          </div>
-        </transition>
-      </div>
+  <div class="mars-view">
+    <Header
+      mode="mars"
+      :mars-rovers="roverItems"
+      :mars-landmarks="landmarkItems"
+      @select-rover="handleSelectRover"
+      @select-landmark="handleSelectLandmark"
+    />
+    <div class="mars-main">
+      <MarsFlightPanel
+        :rovers="roverItems"
+        :selected-rover-id="selectedRoverId"
+        :landmarks="landmarkItems"
+        :selected-landmark-key="selectedLandmarkKey"
+        :current-sol="currentSol"
+        @select-rover="handleSelectRover"
+        @select-landmark="handleSelectLandmark"
+      />
+      <div ref="cesiumContainer" class="cesium-container"></div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .mars-view {
-  position: relative;
   width: 100%;
   height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.mars-main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
 }
 
 .cesium-container {
   width: 100%;
   height: 100%;
-}
-
-/* Cesium 风格工具栏 */
-.mars-toolbar {
-  position: absolute;
-  top: 50px;
-  left: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  z-index: 10;
-}
-
-.toolbar-btn {
-  position: relative;
-}
-
-.cesium-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  min-width: 100px;
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  color: #e0e0e0;
-  font-size: 13px;
-  font-family: 'Segoe UI', sans-serif;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  backdrop-filter: blur(4px);
-}
-
-.cesium-btn:hover {
-  background: rgba(0, 0, 0, 0.85);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #fff;
-}
-
-.btn-icon {
-  font-size: 14px;
-  line-height: 1;
-}
-
-.btn-text {
-  flex: 1;
-  text-align: left;
-}
-
-.btn-arrow {
-  font-size: 10px;
-  transition: transform 0.2s ease;
-}
-
-.btn-arrow.open {
-  transform: rotate(180deg);
-}
-
-/* 下拉面板 */
-.dropdown-panel {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 4px;
-  min-width: 180px;
-  max-height: 400px;
-  overflow-y: auto;
-  background: rgba(20, 20, 25, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.landmark-panel {
-  min-width: 220px;
-}
-
-.dropdown-panel::-webkit-scrollbar {
-  width: 4px;
-}
-
-.dropdown-panel::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 12px;
-  border: none;
-  background: transparent;
-  color: #ccc;
-  font-size: 13px;
-  font-family: 'Segoe UI', sans-serif;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.1s ease;
-}
-
-.dropdown-item:hover {
-  background: rgba(64, 158, 255, 0.2);
-  color: #fff;
-}
-
-.item-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #409eff;
-  flex-shrink: 0;
-}
-
-.landmark-dot {
-  background: #f3f263;
-}
-
-/* 下拉动画 */
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
+  min-height: 0;
 }
 
 /* 动画高亮 */

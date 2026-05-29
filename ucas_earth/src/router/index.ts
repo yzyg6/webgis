@@ -20,6 +20,12 @@ const routes = [
 		component: () => import('../views/MarsView.vue'),
 		meta: { title: '火星探索', activePath: '/mars' },
 	},
+	{
+		path: '/city',
+		name: 'city',
+		component: () => import('../views/CityRoamingView.vue'),
+		meta: { title: '城市漫游', activePath: '/city' },
+	},
 ]
 
 const router = createRouter({

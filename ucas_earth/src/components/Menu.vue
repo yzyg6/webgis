@@ -11,6 +11,7 @@ const menuItems = [
 	{ index: '/', title: '首页', icon: '⌂' },
 	{ index: '/campus', title: '校园展示', icon: '◈' },
 	{ index: '/mars', title: '火星探索', icon: '◉' },
+	{ index: '/city', title: '城市漫游', icon: '🌆' },
 ]
 
 const onExpand = () => {
