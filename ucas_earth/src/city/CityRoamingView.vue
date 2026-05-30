@@ -18,7 +18,7 @@ const searchCity = async () => {
     if (data.length > 0) {
       const { lat, lon, display_name } = data[0]
       viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(parseFloat(lon), parseFloat(lat), 500000),
+        destination: Cesium.Cartesian3.fromDegrees(parseFloat(lon), parseFloat(lat), 2000),
         orientation: {
           heading: 0,
           pitch: Cesium.Math.toRadians(-45),
