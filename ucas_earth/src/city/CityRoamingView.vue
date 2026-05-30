@@ -2,10 +2,27 @@
 import { markRaw, onMounted, onUnmounted, ref } from 'vue'
 import * as Cesium from 'cesium'
 import Header from './components/Header.vue'
+import CityPanel from './components/CityPanel.vue'
+import type { HotCity } from './types/city'
 
 const cesiumContainer = ref<HTMLDivElement | null>(null)
 const searchQuery = ref('')
+const selectedCity = ref<string | null>(null)
 let viewer: Cesium.Viewer | null = null
+
+const flyToCity = (city: HotCity) => {
+  if (!viewer) return
+  selectedCity.value = city.nameEn
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(city.lon, city.lat, 2000),
+    orientation: {
+      heading: 0,
+      pitch: Cesium.Math.toRadians(-45),
+      roll: 0,
+    },
+    duration: 2,
+  })
+}
 
 const searchCity = async () => {
   if (!viewer || !searchQuery.value.trim()) return
@@ -118,17 +135,23 @@ onUnmounted(() => {
   <div class="city-view">
     <Header mode="city" />
     <div class="city-main">
-      <div class="search-box">
-        <input
-          v-model="searchQuery"
-          class="search-input"
-          type="text"
-          placeholder="搜索城市..."
-          @keydown.enter="searchCity"
-        />
-        <button class="search-btn" @click="searchCity">搜索</button>
+      <CityPanel
+        :selected-city="selectedCity"
+        @select-city="flyToCity"
+      />
+      <div class="cesium-wrapper">
+        <div class="search-box">
+          <input
+            v-model="searchQuery"
+            class="search-input"
+            type="text"
+            placeholder="搜索城市..."
+            @keydown.enter="searchCity"
+          />
+          <button class="search-btn" @click="searchCity">搜索</button>
+        </div>
+        <div ref="cesiumContainer" class="cesium-container"></div>
       </div>
-      <div ref="cesiumContainer" class="cesium-container"></div>
     </div>
   </div>
 </template>
@@ -143,7 +166,13 @@ onUnmounted(() => {
 
 .city-main {
   min-height: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.cesium-wrapper {
   position: relative;
+  min-height: 0;
 }
 
 .cesium-container {
