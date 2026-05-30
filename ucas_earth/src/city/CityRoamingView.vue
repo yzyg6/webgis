@@ -8,7 +8,33 @@ import type { HotCity } from './types/city'
 const cesiumContainer = ref<HTMLDivElement | null>(null)
 const searchQuery = ref('')
 const selectedCity = ref<string | null>(null)
+const google3DTilesEnabled = ref(false)
 let viewer: Cesium.Viewer | null = null
+let google3DTileset: Cesium.Cesium3DTileset | null = null
+
+const toggleGoogle3DTiles = async () => {
+  if (!viewer || viewer.isDestroyed()) return
+
+  if (google3DTilesEnabled.value) {
+    // 关闭：移除 tileset
+    if (google3DTileset) {
+      viewer.scene.primitives.remove(google3DTileset)
+      google3DTileset = null
+    }
+    google3DTilesEnabled.value = false
+  } else {
+    // 开启：加载 Google 3D Tiles
+    try {
+      google3DTileset = await Cesium.Cesium3DTileset.fromIonAssetId(2275207)
+      if (viewer && !viewer.isDestroyed()) {
+        viewer.scene.primitives.add(google3DTileset)
+        google3DTilesEnabled.value = true
+      }
+    } catch (e) {
+      console.warn('Google 3D Tiles 加载失败:', e)
+    }
+  }
+}
 
 const flyToCity = (city: HotCity) => {
   if (!viewer) return
@@ -133,7 +159,11 @@ onUnmounted(() => {
 
 <template>
   <div class="city-view">
-    <Header mode="city" />
+    <Header
+      mode="city"
+      :google3-d-tiles-enabled="google3DTilesEnabled"
+      @toggle-google3-d-tiles="toggleGoogle3DTiles"
+    />
     <div class="city-main">
       <CityPanel
         :selected-city="selectedCity"

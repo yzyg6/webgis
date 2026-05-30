@@ -103,6 +103,13 @@
           <span class="menu-icon">🌆</span>
           <span class="menu-label">城市漫游</span>
         </div>
+        <div class="menu-item clickable" @click="emit('toggleGoogle3DTiles')">
+          <span class="menu-icon">🏗️</span>
+          <span class="menu-label">Google 3D</span>
+          <span class="toggle-badge" :class="{ on: props.google3DTilesEnabled }">
+            {{ props.google3DTilesEnabled ? 'ON' : 'OFF' }}
+          </span>
+        </div>
       </template>
     </div>
 
@@ -158,6 +165,7 @@ const props = withDefaults(defineProps<{
   showDbPanel?: boolean;
   marsRovers?: RoverItem[];
   marsLandmarks?: LandmarkItem[];
+  google3DTilesEnabled?: boolean;
 }>(), {
   mode: "campus",
   cityLayers: () => [],
@@ -166,6 +174,7 @@ const props = withDefaults(defineProps<{
   showDbPanel: false,
   marsRovers: () => [],
   marsLandmarks: () => [],
+  google3DTilesEnabled: false,
 });
 
 const emit = defineEmits<{
@@ -178,6 +187,7 @@ const emit = defineEmits<{
   closeDbPanel: [];
   selectRover: [id: string];
   selectLandmark: [key: string];
+  toggleGoogle3DTiles: [];
 }>();
 
 const headerTitle = computed(() => {
@@ -271,4 +281,27 @@ const todayText = new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "2-
 .db-load-btn { border: 0; border-radius: 6px; padding: 6px 14px; font-size: 13px; cursor: pointer; background: var(--bg-accent-subtle); color: var(--text-accent); font-weight: 500; }
 .db-load-btn:hover { background: var(--bg-accent-subtle-hover); }
 @media (max-width: 900px) { .app-header { gap: 10px; padding: 0 10px; } .title { font-size: 18px; } .subtitle, .meta { display: none; } }
+.clickable {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.clickable:hover {
+  background: var(--bg-menu-hover, rgba(100, 116, 139, 0.15));
+}
+
+.toggle-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(100, 116, 139, 0.3);
+  color: var(--text-muted, #94a3b8);
+  letter-spacing: 0.5px;
+}
+
+.toggle-badge.on {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
 </style>
