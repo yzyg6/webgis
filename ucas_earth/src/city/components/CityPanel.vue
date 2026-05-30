@@ -21,7 +21,6 @@ const hotCities: HotCity[] = [
   { name: '杭州', nameEn: 'hangzhou', lon: 120.2, lat: 30.3, region: '中国', emoji: '🇨🇳' },
   { name: '西安', nameEn: 'xian', lon: 108.9, lat: 34.3, region: '中国', emoji: '🇨🇳' },
   { name: '重庆', nameEn: 'chongqing', lon: 106.5, lat: 29.6, region: '中国', emoji: '🇨🇳' },
-  { name: '阜阳', nameEn: 'fuyang', lon: 115.8, lat: 32.9, region: '中国', emoji: '🇨🇳' },
   { name: '东京', nameEn: 'tokyo', lon: 139.7, lat: 35.7, region: '亚洲', emoji: '🇯🇵' },
   { name: '迪拜', nameEn: 'dubai', lon: 55.3, lat: 25.3, region: '亚洲', emoji: '🇦🇪' },
   { name: '纽约', nameEn: 'newyork', lon: -74.0, lat: 40.7, region: '美洲', emoji: '🇺🇸' },
