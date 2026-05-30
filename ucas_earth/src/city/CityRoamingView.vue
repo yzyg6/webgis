@@ -11,19 +11,28 @@ const selectedCity = ref<string | null>(null)
 const google3DTilesEnabled = ref(false)
 let viewer: Cesium.Viewer | null = null
 let google3DTileset: Cesium.Cesium3DTileset | null = null
+let baseImageryLayer: Cesium.ImageryLayer | null = null
 
 const toggleGoogle3DTiles = async () => {
   if (!viewer || viewer.isDestroyed()) return
 
   if (google3DTilesEnabled.value) {
-    // 关闭：移除 tileset
+    // 关闭：移除 tileset，恢复底图
     if (google3DTileset) {
       viewer.scene.primitives.remove(google3DTileset)
       google3DTileset = null
     }
+    if (baseImageryLayer) {
+      baseImageryLayer.show = true
+    }
     google3DTilesEnabled.value = false
   } else {
-    // 开启：加载 Google 3D Tiles
+    // 开启：隐藏底图，加载 Google 3D Tiles
+    const layers = viewer.imageryLayers
+    if (layers.length > 0) {
+      baseImageryLayer = layers.get(0)
+      baseImageryLayer.show = false
+    }
     try {
       google3DTileset = await Cesium.Cesium3DTileset.fromIonAssetId(2275207)
       if (viewer && !viewer.isDestroyed()) {
@@ -32,6 +41,11 @@ const toggleGoogle3DTiles = async () => {
       }
     } catch (e) {
       console.warn('Google 3D Tiles 加载失败:', e)
+      // 加载失败时恢复底图
+      if (baseImageryLayer) {
+        baseImageryLayer.show = true
+        baseImageryLayer = null
+      }
     }
   }
 }
