@@ -8,7 +8,7 @@
 import { markRaw, onMounted, onUnmounted, ref, toRaw, watch } from "vue";
 import * as Cesium from "cesium";
 import { getBuildingType } from '../data/building-type-mapping';
-import type { BuildingType } from '../types/building';
+import type { BuildingType } from '../../shared/types/building';
 import { RainEffect, SnowEffect, type WeatherType } from '../utils/weather-effects';
 
 type BaseLayerType = "osm" | "arcgis" | "carto" | "google-satellite";

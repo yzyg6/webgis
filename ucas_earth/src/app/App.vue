@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import * as Cesium from "cesium";
 import Menu from "./components/Menu.vue";
-
-Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 </script>
 
 <template>

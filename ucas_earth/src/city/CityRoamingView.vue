@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { markRaw, onMounted, onUnmounted, ref } from 'vue'
 import * as Cesium from 'cesium'
-import Header from '../components/Header.vue'
+import Header from './components/Header.vue'
 
 const cesiumContainer = ref<HTMLDivElement | null>(null)
 const searchQuery = ref('')
@@ -37,60 +37,75 @@ onMounted(async () => {
 
   Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN
 
-  viewer = markRaw(
-    new Cesium.Viewer(cesiumContainer.value, {
-      baseLayer: false,
-      baseLayerPicker: false,
-      geocoder: false,
-      timeline: false,
-      animation: false,
-      sceneModePicker: false,
-      navigationHelpButton: false,
-    }),
-  )
+  try {
+    viewer = markRaw(
+      new Cesium.Viewer(cesiumContainer.value, {
+        baseLayer: false,
+        baseLayerPicker: false,
+        geocoder: false,
+        timeline: false,
+        animation: false,
+        sceneModePicker: false,
+        navigationHelpButton: false,
+      }),
+    )
+  } catch (e) {
+    console.error('Cesium Viewer 创建失败:', e)
+    return
+  }
 
-  // 加载卫星底图
-  viewer.imageryLayers.addImageryProvider(
-    new Cesium.UrlTemplateImageryProvider({
-      url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-      tileWidth: 256,
-      tileHeight: 256,
-      maximumLevel: 20,
-    }),
-  )
+  if (!viewer) return
+
+  // 加载 OSM 底图
+  try {
+    viewer.imageryLayers.addImageryProvider(
+      new Cesium.OpenStreetMapImageryProvider({
+        url: "https://tile.openstreetmap.org/",
+      }),
+    )
+  } catch (e) {
+    console.warn('底图加载失败:', e)
+  }
 
   // 加载地形
   try {
-    viewer.terrainProvider = await Cesium.CesiumTerrainProvider.fromIonAssetId(1)
-    viewer.scene.globe.depthTestAgainstTerrain = true
+    const terrainProvider = await Cesium.CesiumTerrainProvider.fromIonAssetId(1)
+    if (viewer && !viewer.isDestroyed()) {
+      viewer.terrainProvider = terrainProvider
+      viewer.scene.globe.depthTestAgainstTerrain = true
+    }
   } catch (e) {
     console.warn('地形加载失败:', e)
   }
 
   // 加载 OSM Buildings
   try {
-    const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(96188)
-    viewer.scene.primitives.add(tileset)
-    await viewer.zoomTo(tileset)
+    if (viewer && !viewer.isDestroyed()) {
+      const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(96188)
+      viewer.scene.primitives.add(tileset)
+      await viewer.zoomTo(tileset)
 
-    // 应用默认样式
-    const extras = tileset.asset.extras
-    if (
-      Cesium.defined(extras) &&
-      Cesium.defined((extras as any).ion) &&
-      Cesium.defined((extras as any).ion.defaultStyle)
-    ) {
-      tileset.style = new Cesium.Cesium3DTileStyle((extras as any).ion.defaultStyle)
+      // 应用默认样式
+      const extras = tileset.asset.extras
+      if (
+        Cesium.defined(extras) &&
+        Cesium.defined((extras as any).ion) &&
+        Cesium.defined((extras as any).ion.defaultStyle)
+      ) {
+        tileset.style = new Cesium.Cesium3DTileStyle((extras as any).ion.defaultStyle)
+      }
     }
   } catch (e) {
     console.warn('OSM Buildings 加载失败:', e)
   }
 
   // 飞到中国上空
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(116.4, 39.9, 5000000),
-    duration: 0,
-  })
+  if (viewer && !viewer.isDestroyed()) {
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(116.4, 39.9, 5000000),
+      duration: 0,
+    })
+  }
 })
 
 onUnmounted(() => {

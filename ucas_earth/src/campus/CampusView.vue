@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { computed, markRaw, onMounted, onUnmounted, ref, watch } from "vue";
-import Header from "../components/Header.vue";
-import CesiumViewer from "../components/CesiumViewer.vue";
-import SidebarContainer from "../components/SidebarContainer.vue";
-import HoverTooltip from "../components/HoverTooltip.vue";
-import EditPanel from "../components/EditPanel.vue";
-import BuildingPopup from "../components/BuildingPopup.vue";
-import { createLayer as dbCreateLayer, listLayers as dbListLayers, getLayer as dbGetLayer, updateLayer as dbUpdateLayer } from "../api/geojson-db";
-import type { GeoJsonLayerMeta } from "../types/geojson-db";
-import { getBuildingMeta, getAllBuildingMetas } from "../data/campus-buildings";
-import type { BuildingMeta } from "../data/campus-buildings";
-import { getBuildingType } from "../data/building-type-mapping";
-import { BUILDING_TYPE_LABELS } from "../types/building";
-import { createCourse, listCourses, updateCourse, deleteCourse, importCourses } from "../api/courses";
-import type { Course, CourseCreateInput, CourseImportRow } from "../types/courses";
-import { getCurrentWeek, getCurrentDay } from "../utils/weekRange";
-import CourseForm from "../components/CourseForm.vue";
-import CourseImport from "../components/CourseImport.vue";
-import CourseDetail from "../components/CourseDetail.vue";
+import Header from "./components/Header.vue";
+import CesiumViewer from "./components/CesiumViewer.vue";
+import SidebarContainer from "./components/SidebarContainer.vue";
+import HoverTooltip from "./components/HoverTooltip.vue";
+import EditPanel from "./components/EditPanel.vue";
+import BuildingPopup from "./components/BuildingPopup.vue";
+import { createLayer as dbCreateLayer, listLayers as dbListLayers, getLayer as dbGetLayer, updateLayer as dbUpdateLayer } from "./api/geojson-db";
+import type { GeoJsonLayerMeta } from "./types/geojson-db";
+import { getBuildingMeta, getAllBuildingMetas } from "./data/campus-buildings";
+import type { BuildingMeta } from "./data/campus-buildings";
+import { getBuildingType } from "./data/building-type-mapping";
+import { BUILDING_TYPE_LABELS } from "../shared/types/building";
+import { createCourse, listCourses, updateCourse, deleteCourse, importCourses } from "./api/courses";
+import type { Course, CourseCreateInput, CourseImportRow } from "./types/courses";
+import { getCurrentWeek, getCurrentDay } from "./utils/weekRange";
+import CourseForm from "./components/CourseForm.vue";
+import CourseImport from "./components/CourseImport.vue";
+import CourseDetail from "./components/CourseDetail.vue";
 
 type BaseLayerType = "osm" | "arcgis" | "carto" | "google-satellite";
 type GeoJsonObject = Record<string, unknown>;
@@ -528,6 +528,7 @@ onUnmounted(() => {
 				ref="cesiumViewerRef"
 				:base-layer="currentBaseLayer"
 				:city-layers="cityLayers"
+				:fly-offset="{ pitch: -40, rangeScale: 2 }"
 				@hover-entity="handleHoverEntity"
 				@edit-entity="handleEditEntity"
 				@select-entity="handleSelectEntity"

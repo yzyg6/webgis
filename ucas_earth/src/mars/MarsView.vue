@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { markRaw, nextTick, onMounted, onUnmounted, ref, reactive } from 'vue'
 import * as Cesium from 'cesium'
-import Header from '../components/Header.vue'
-import MarsFlightPanel from '../components/mars/MarsFlightPanel.vue'
+import Header from './components/Header.vue'
+import MarsFlightPanel from './components/MarsFlightPanel.vue'
 
 // === 中文翻译映射 ===
 const ROVER_NAMES: Record<string, string> = {

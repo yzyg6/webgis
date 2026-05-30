@@ -33,8 +33,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Course } from '../types/courses';
-import type { BuildingType } from '../types/building';
-import { BUILDING_TYPE_LABELS } from '../types/building';
+import type { BuildingType } from '../../shared/types/building';
+import { BUILDING_TYPE_LABELS } from '../../shared/types/building';
 
 const props = defineProps<{
   visible: boolean;
