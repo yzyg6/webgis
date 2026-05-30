@@ -80,3 +80,4 @@ tmp/
 # External reference repos
 cesium-vue3-vite/
 ucas_earth/src/env.d.ts
+.github/copilot-instructions.md
