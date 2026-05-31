@@ -19,6 +19,7 @@ const radius = ref(500)
 let viewer: Cesium.Viewer | null = null
 let handler: Cesium.ScreenSpaceEventHandler | null = null
 let viewshedInstance: Viewshed | null = null
+let lastPickedPosition: Cesium.Cartesian3 | null = null
 
 // 参数变更时同步到 viewshed 实例
 watch([observerHeight, targetHeight, radius], () => {
@@ -66,13 +67,15 @@ const switchBaseLayer = (layerType: BaseLayerType) => {
 const handleStartPick = () => {
   isPicking.value = true
   hasResult.value = false
-  // 清除旧结果
   viewshedInstance?.clear()
+  lastPickedPosition = null
 }
 
-const handleAnalyse = (position: Cesium.Cartesian3) => {
-  if (!viewshedInstance || !viewer) return
+const runAnalyse = (position: Cesium.Cartesian3) => {
+  if (!viewshedInstance) return
+  lastPickedPosition = position
   isAnalyzing.value = true
+  isPicking.value = false
   viewshedInstance.analyse(position).then(() => {
     hasResult.value = true
     isAnalyzing.value = false
@@ -81,10 +84,19 @@ const handleAnalyse = (position: Cesium.Cartesian3) => {
   })
 }
 
+/** ViewshedPanel 发出 start-analyse 时用上次选取的位置重新分析 */
+const handlePanelAnalyse = () => {
+  if (lastPickedPosition) {
+    runAnalyse(lastPickedPosition)
+  }
+}
+
 const handleClearResult = () => {
   viewshedInstance?.clear()
   hasResult.value = false
   isPicking.value = false
+  isAnalyzing.value = false
+  lastPickedPosition = null
 }
 
 // === 地图点击交互 ===
@@ -97,8 +109,7 @@ const setupClickHandler = () => {
     if (!ray) return
     const position = viewer.scene.globe.pick(ray, viewer.scene)
     if (!position) return
-    isPicking.value = false
-    handleAnalyse(position)
+    runAnalyse(position)
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
 }
 
@@ -192,7 +203,7 @@ onUnmounted(() => {
         @update:target-height="targetHeight = $event"
         @update:radius="radius = $event"
         @start-pick="handleStartPick"
-        @start-analyse="handleStartAnalyse"
+        @start-analyse="handlePanelAnalyse"
         @clear-result="handleClearResult"
       />
       <div ref="cesiumContainer" class="cesium-container"></div>

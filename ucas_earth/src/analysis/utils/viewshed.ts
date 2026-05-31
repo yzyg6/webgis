@@ -111,73 +111,78 @@ export class Viewshed {
 
       const halfStep = step / 2
       const totalRows = gridSize + 1
-      let currentRow = 0
 
-      const processRow = () => {
-        const rowStart = currentRow
-        const rowEnd = Math.min(rowStart + 1, totalRows)
-
-        for (const sample of samples) {
-          if (sample.i < rowStart || sample.i >= rowEnd) continue
-
-          const { localX, localY } = sample
-
-          // 计算目标点
-          const localPos = new Cesium.Cartesian3(localX, localY, 0)
-          const targetSurface = Cesium.Matrix4.multiplyByPoint(enuMatrix, localPos, new Cesium.Cartesian3())
-          const targetCartographic = Cesium.Cartographic.fromCartesian(targetSurface)
-          const targetCartesian = Cesium.Cartesian3.fromRadians(
-            targetCartographic.longitude,
-            targetCartographic.latitude,
-            targetCartographic.height + this.zdOffset
-          )
-
-          // 射线检测
-          const direction = Cesium.Cartesian3.subtract(targetCartesian, observerCartesian, new Cesium.Cartesian3())
-          Cesium.Cartesian3.normalize(direction, direction)
-          const ray = new Cesium.Ray(observerCartesian, direction)
-
-          let isVisible = true
-          const result = scene.pickFromRay(ray, undefined, Cesium.Scene.CLAMP_TO_HEIGHT)
-          if (Cesium.defined(result) && Cesium.defined(result.position)) {
-            const hitDistance = Cesium.Cartesian3.distance(observerCartesian, result.position)
-            const targetDistance = Cesium.Cartesian3.distance(observerCartesian, targetCartesian)
-            if (hitDistance < targetDistance * 0.95) {
-              isVisible = false
-            }
-          }
-
-          // 渲染采样格子
-          const corners = [
-            Cesium.Matrix4.multiplyByPoint(enuMatrix, new Cesium.Cartesian3(localX - halfStep, localY - halfStep, 0), new Cesium.Cartesian3()),
-            Cesium.Matrix4.multiplyByPoint(enuMatrix, new Cesium.Cartesian3(localX + halfStep, localY - halfStep, 0), new Cesium.Cartesian3()),
-            Cesium.Matrix4.multiplyByPoint(enuMatrix, new Cesium.Cartesian3(localX + halfStep, localY + halfStep, 0), new Cesium.Cartesian3()),
-            Cesium.Matrix4.multiplyByPoint(enuMatrix, new Cesium.Cartesian3(localX - halfStep, localY + halfStep, 0), new Cesium.Cartesian3()),
-          ]
-
-          const entity = this.viewer.entities.add({
-            polygon: {
-              hierarchy: new Cesium.PolygonHierarchy(corners),
-              material: isVisible ? this.visibleColor : this.invisibleColor,
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-            },
-          })
-          this.entities.push(entity)
+      // 逐行异步处理
+      const processBatch = (batchIndex: number) => {
+        if (batchIndex >= totalRows) {
+          resolve()
+          return
         }
 
-        currentRow = rowEnd
-        if (onProgress) onProgress(currentRow / totalRows)
+        try {
+          for (const sample of samples) {
+            if (sample.i !== batchIndex) continue
 
-        if (currentRow < totalRows) {
-          // 让出主线程，下一行延迟执行
-          setTimeout(processRow, 0)
-        } else {
-          resolve()
+            const { localX, localY } = sample
+
+            // 计算目标点
+            const localPos = new Cesium.Cartesian3(localX, localY, 0)
+            const targetSurface = Cesium.Matrix4.multiplyByPoint(enuMatrix, localPos, new Cesium.Cartesian3())
+            const targetCartographic = Cesium.Cartographic.fromCartesian(targetSurface)
+            const targetCartesian = Cesium.Cartesian3.fromRadians(
+              targetCartographic.longitude,
+              targetCartographic.latitude,
+              targetCartographic.height + this.zdOffset
+            )
+
+            // 射线检测
+            const direction = Cesium.Cartesian3.subtract(targetCartesian, observerCartesian, new Cesium.Cartesian3())
+            Cesium.Cartesian3.normalize(direction, direction)
+            const ray = new Cesium.Ray(observerCartesian, direction)
+
+            let isVisible = true
+            try {
+              const result = scene.pickFromRay(ray)
+              if (Cesium.defined(result) && Cesium.defined(result.position)) {
+                const hitDistance = Cesium.Cartesian3.distance(observerCartesian, result.position)
+                const targetDistance = Cesium.Cartesian3.distance(observerCartesian, targetCartesian)
+                if (hitDistance < targetDistance * 0.95) {
+                  isVisible = false
+                }
+              }
+            } catch {
+              isVisible = true
+            }
+
+            // 渲染采样格子
+            const corners = [
+              Cesium.Matrix4.multiplyByPoint(enuMatrix, new Cesium.Cartesian3(localX - halfStep, localY - halfStep, 0), new Cesium.Cartesian3()),
+              Cesium.Matrix4.multiplyByPoint(enuMatrix, new Cesium.Cartesian3(localX + halfStep, localY - halfStep, 0), new Cesium.Cartesian3()),
+              Cesium.Matrix4.multiplyByPoint(enuMatrix, new Cesium.Cartesian3(localX + halfStep, localY + halfStep, 0), new Cesium.Cartesian3()),
+              Cesium.Matrix4.multiplyByPoint(enuMatrix, new Cesium.Cartesian3(localX - halfStep, localY + halfStep, 0), new Cesium.Cartesian3()),
+            ]
+
+            const entity = this.viewer.entities.add({
+              polygon: {
+                hierarchy: new Cesium.PolygonHierarchy(corners),
+                height: 0,
+                material: isVisible ? this.visibleColor : this.invisibleColor,
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+              },
+            })
+            this.entities.push(entity)
+          }
+
+          if (onProgress) onProgress((batchIndex + 1) / totalRows)
+          setTimeout(() => processBatch(batchIndex + 1), 0)
+        } catch (e) {
+          console.error('可视域分析第', batchIndex, '行出错:', e)
+          setTimeout(() => processBatch(batchIndex + 1), 0)
         }
       }
 
       // 开始分批处理
-      setTimeout(processRow, 0)
+      setTimeout(() => processBatch(0), 0)
     })
   }
 
