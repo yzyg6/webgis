@@ -73,10 +73,10 @@ const handleStartPick = () => {
 const handleAnalyse = (position: Cesium.Cartesian3) => {
   if (!viewshedInstance || !viewer) return
   isAnalyzing.value = true
-  // 使用 requestAnimationFrame 确保 UI 更新后再执行分析
-  requestAnimationFrame(() => {
-    viewshedInstance!.analyse(position)
+  viewshedInstance.analyse(position).then(() => {
     hasResult.value = true
+    isAnalyzing.value = false
+  }).catch(() => {
     isAnalyzing.value = false
   })
 }
