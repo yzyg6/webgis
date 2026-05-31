@@ -11,7 +11,7 @@ const routes = [
 		path: '/campus',
 		name: 'campus',
 		component: () => import('../../campus/CampusView.vue'),
-		meta: { title: 'FYUN 校园系统', activePath: '/campus' },
+		meta: { title: 'Cesium Learn&Show', activePath: '/campus' },
 	},
 	{
 		path: '/mars',
