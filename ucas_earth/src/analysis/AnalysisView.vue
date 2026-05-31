@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { markRaw, onMounted, onUnmounted, ref } from 'vue'
+import { markRaw, onMounted, onUnmounted, ref, watch } from 'vue'
 import * as Cesium from 'cesium'
 import Header from './components/Header.vue'
 import ViewshedPanel from './components/ViewshedPanel.vue'
+import { Viewshed } from './utils/viewshed'
 import type { BaseLayerType } from './types/analysis'
 
 const cesiumContainer = ref<HTMLDivElement | null>(null)
@@ -17,6 +18,16 @@ const radius = ref(500)
 
 let viewer: Cesium.Viewer | null = null
 let handler: Cesium.ScreenSpaceEventHandler | null = null
+let viewshedInstance: Viewshed | null = null
+
+// 参数变更时同步到 viewshed 实例
+watch([observerHeight, targetHeight, radius], () => {
+  viewshedInstance?.updateParams({
+    qdOffset: observerHeight.value,
+    zdOffset: targetHeight.value,
+    radius: radius.value,
+  })
+})
 
 // === 底图切换 ===
 const switchBaseLayer = (layerType: BaseLayerType) => {
@@ -55,21 +66,23 @@ const switchBaseLayer = (layerType: BaseLayerType) => {
 const handleStartPick = () => {
   isPicking.value = true
   hasResult.value = false
+  // 清除旧结果
+  viewshedInstance?.clear()
 }
 
-const handleStartAnalyse = () => {
-  // === 预留：用户后续提供核心分析逻辑 ===
-  // isAnalyzing.value = true
-  // viewshedInstance.analyse(...)
-  // isAnalyzing.value = false
-  // hasResult.value = true
-  console.log('可视域分析 - 预留接口：等待核心代码')
-  console.log('参数:', { observerHeight: observerHeight.value, targetHeight: targetHeight.value, radius: radius.value })
+const handleAnalyse = (position: Cesium.Cartesian3) => {
+  if (!viewshedInstance || !viewer) return
+  isAnalyzing.value = true
+  // 使用 requestAnimationFrame 确保 UI 更新后再执行分析
+  requestAnimationFrame(() => {
+    viewshedInstance!.analyse(position)
+    hasResult.value = true
+    isAnalyzing.value = false
+  })
 }
 
 const handleClearResult = () => {
-  // === 预留：用户后续提供清除逻辑 ===
-  // viewshedInstance?.clear()
+  viewshedInstance?.clear()
   hasResult.value = false
   isPicking.value = false
 }
@@ -85,10 +98,7 @@ const setupClickHandler = () => {
     const position = viewer.scene.globe.pick(ray, viewer.scene)
     if (!position) return
     isPicking.value = false
-    hasResult.value = true
-    // === 预留：调用 viewshed 分析 ===
-    // handleAnalyse(position)
-    console.log('观察点已选取:', position)
+    handleAnalyse(position)
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
 }
 
@@ -137,6 +147,13 @@ onMounted(async () => {
     console.warn('地形加载失败，使用默认椭球体:', e)
   }
 
+  // 初始化 viewshed 实例
+  viewshedInstance = new Viewshed(viewer, {
+    qdOffset: observerHeight.value,
+    zdOffset: targetHeight.value,
+    radius: radius.value,
+  })
+
   // 设置点击交互
   setupClickHandler()
 
@@ -151,6 +168,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   handler?.destroy()
+  viewshedInstance?.destroy()
+  viewshedInstance = null
   if (viewer && !viewer.isDestroyed()) {
     viewer.destroy()
     viewer = null
