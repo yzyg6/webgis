@@ -1,9 +1,0 @@
-packages:
-  # 所有packages下的子目录皆为模块/
-  - 'packages/*'
-  - '!demo/*'
-allowBuilds:
-  canvas: true
-  esbuild: true
-  protobufjs: true
-  unrs-resolver: true
