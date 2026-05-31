@@ -25,6 +25,12 @@ const routes = [
 		component: () => import('../../city/CityRoamingView.vue'),
 		meta: { title: '城市漫游', activePath: '/city' },
 	},
+	{
+		path: '/analysis',
+		name: 'analysis',
+		component: () => import('../../analysis/AnalysisView.vue'),
+		meta: { title: '空间分析', activePath: '/analysis' },
+	},
 ]
 
 const router = createRouter({
