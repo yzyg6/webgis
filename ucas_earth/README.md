@@ -11,6 +11,7 @@
   - [校园展示](#校园展示)
   - [火星探索](#火星探索)
   - [城市漫游](#城市漫游)
+  - [空间分析](#空间分析)
 - [技术栈](#技术栈)
 - [项目结构](#项目结构)
 - [环境要求](#环境要求)
@@ -66,6 +67,15 @@
 - **Google 3D Tiles**：支持切换 Google Photorealistic 3D Tiles（Cesium Ion Asset ID: 2275207）
 - **暗色/亮色主题**：支持主题切换
 
+### 空间分析
+
+提供可视域分析功能，基于地形射线检测计算可见与不可见区域。
+
+- **可视域分析**：选择观察点，设置观察者高度、目标高度和分析半径，实时计算可视区域
+- **分批异步渲染**：40×40 网格采样，每行处理后让出主线程，避免 UI 卡顿
+- **结果着色**：可见区域（绿色半透明）和不可见区域（红色半透明）实时渲染在地图上
+- **底图切换**：支持 OSM / ArcGIS / Carto Light / Google Satellite 四种底图
+
 ---
 
 ## 技术栈
@@ -120,7 +130,7 @@ ucas_earth/
     │   │   ├── CesiumViewer.vue  #   通用 Cesium 地球组件
     │   │   └── Menu.vue          #   左侧导航菜单
     │   ├── router/
-    │   │   └── index.ts          #   路由配置（/ /campus /mars /city）
+    │       └── index.ts          #   路由配置（/ /campus /mars /city /analysis）
     │   └── views/
     │       └── HomeView.vue      #   首页视图
     ├── campus/                   # 🏫 校园展示模块
@@ -143,6 +153,12 @@ ucas_earth/
     │   ├── composables/          #   组合式函数
     │   ├── data/                 #   热门城市数据
     │   └── types/                #   类型定义（HotCity）
+    ├── analysis/                 # 📐 空间分析模块
+    │   ├── AnalysisView.vue      #   主视图（Cesium + 可视域分析）
+    │   ├── components/           #   组件（Header、ViewshedPanel、ThemeToggle）
+    │   ├── composables/          #   组合式函数（useTheme）
+    │   ├── types/                #   类型定义（BaseLayerType、AnalysisStatus）
+    │   └── utils/                #   工具函数（viewshed 可视域分析算法）
     └── shared/                   # 🔗 共享模块
         ├── cdk/                  #   通用 CDK
         ├── components/           #   共享组件
@@ -294,7 +310,7 @@ npm run preview
 - 状态管理通过 props/emit 向下传递，无需 Pinia/Vuex
 - Cesium API 调用封装在生命周期钩子（`onMounted`、`onUnmounted`）中
 - 修改场景后调用 `viewer.scene.requestRender()` 按需渲染
-- 各模块（campus / mars / city）独立目录，共享类型提取至 `shared/types`
+- 各模块（campus / mars / city / analysis）独立目录，共享类型提取至 `shared/types`
 
 ---
 
