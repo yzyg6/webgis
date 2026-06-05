@@ -169,9 +169,41 @@ cd ucas_earth
 npm install
 ```
 
-### 2. 配置环境变量（可选）
+### 2. 配置 Cesium Ion Token（必须）
 
-如果需要使用课程管理的后端功能，创建 `.env` 文件：
+**⚠️ 重要：Cesium Ion Token 是本项目的核心配置，没有 Token 将无法加载 3D 地球、地形和建筑数据。**
+
+1. 访问 [Cesium Ion 官网](https://cesium.com/ion/tokens) 注册并登录账号
+2. 在 Dashboard 中创建一个新的 Access Token（选择 "Default" 类型）
+3. 在项目根目录创建 `.env` 文件，添加以下内容：
+
+```env
+VITE_CESIUM_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your_token_here
+```
+
+> 💡 **提示**：Token 格式为 `eyJ...` 开头的 JWT 字符串，确保不要有空格或换行。
+
+4. 重启开发服务器使配置生效：
+
+```bash
+npm run dev
+```
+
+**没有 Token 的影响：**
+- 火星探索模块：无法加载火星地形
+- 城市漫游模块：无法加载 Google 3D Tiles
+- 空间分析模块：无法加载地形数据，影响可视域分析精度
+
+**Token 获取步骤截图说明：**
+1. 登录 Cesium Ion → 进入 Dashboard
+2. 点击 "Create Token" 按钮
+3. 选择 Token 类型为 "Default"（免费）
+4. 复制生成的 Token
+5. 粘贴到 `.env` 文件中
+
+### 3. 配置数据库（可选）
+
+如果需要使用课程管理的后端功能，创建 `.env` 文件中添加数据库连接信息：
 
 ```env
 # PostgreSQL 连接串
@@ -277,12 +309,43 @@ npm run preview
 - **`unplugin-auto-import` + `unplugin-vue-components`**：Element Plus 按需自动导入
 - **开发代理**：`/api` 请求代理至 `http://localhost:9999`
 
-### Cesium Ion
+### 环境变量
 
-部分功能需要有效的 Cesium Ion 访问令牌：
+项目使用 Vite 环境变量配置，在根目录 `.env` 文件中设置：
 
-- **火星地形**：Asset ID `3644333`
-- **Google 3D Tiles**：Asset ID `2275207`
+| 变量名 | 必须 | 说明 |
+|--------|------|------|
+| `VITE_CESIUM_TOKEN` | ✅ 必须 | Cesium Ion Access Token，用于加载 3D 地球、地形、建筑数据 |
+| `DATABASE_URL` | ❌ 可选 | PostgreSQL 连接字符串（课程管理功能需要） |
+| `PORT` | ❌ 可选 | 后端 API 服务端口（默认 9999） |
+
+### Cesium Ion Token
+
+**Token 是什么？**
+Cesium Ion Token 是 Cesium 平台的访问凭证，用于授权访问其托管的 3D 地球数据、地形服务和建筑模型。
+
+**为什么需要 Token？**
+- 加载全球地形数据（Cesium World Terrain）
+- 加载火星地形模型（Mars Terrain）
+- 加载 Google Photorealistic 3D Tiles
+- 加载 OSM Buildings 3D 模型
+
+**Token 使用示例：**
+
+```env
+# .env 文件内容
+VITE_CESIUM_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxxx
+```
+
+**Token 用量说明：**
+- **免费额度**：每月 100,000 次 API 调用
+- **个人学习**：完全足够
+- **生产环境**：建议升级到付费计划
+
+**Token 安全提示：**
+- ⚠️ 不要将 Token 提交到 Git 仓库（已在 .gitignore 中排除）
+- ⚠️ 不要在公共代码仓库中分享 Token
+- ✅ 建议定期轮换 Token
 
 ---
 
