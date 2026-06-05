@@ -27,10 +27,10 @@
 
 ### 首页
 
-欢迎页面，展示 Cesium 三维地球默认视图（以安徽阜阳为中心），提供功能模块导航入口。
+欢迎页面，展示 Cesium 三维地球默认视图，提供功能模块导航入口。
 
 - 左侧可折叠导航菜单
-- 支持多种底图切换（OpenStreetMap、ArcGIS、Carto Light、Google 卫星）
+- ![1780640628776](images/README/1780640628776.png "首页界面")
 
 ### 校园展示
 
@@ -45,6 +45,8 @@
 - **属性悬浮提示**：鼠标悬停建筑时显示属性 tooltip
 - **属性编辑面板**：支持在线编辑 GeoJSON 要素属性
 - **属性表格**：以表格形式展示当前选中图层的所有要素属性
+- ![1780640611517](images/README/1780640611517.png "校园展示界面")
+- ![1780640661195](images/README/1780640661195.png "校园属性表")
 
 ### 火星探索
 
@@ -56,6 +58,7 @@
 - **火星地标**：15 个火星著名地标（奥林帕斯山、水手号峡谷、盖尔撞击坑等），含中文名称和介绍
 - **飞行面板**：支持一键飞往火星车或地标位置，自动旋转展示
 - **《火星救援》路线**：还原电影中的经典路线（The Martian Journey）
+- ![1780640677399](images/README/1780640677399.png "火星探索案例")
 
 ### 城市漫游
 
@@ -65,23 +68,29 @@
 - **热门城市**：内置国内热门城市列表，一键飞往目标城市
 - **Google 3D Tiles**：支持切换 Google Photorealistic 3D Tiles（Cesium Ion Asset ID: 2275207）
 - **暗色/亮色主题**：支持主题切换
+- ![1780640704460](images/README/1780640704460.png "城市漫游上海")
+
+### 空间分析
+
+- **可视域分析**
+- ![1780640722276](images/README/1780640722276.png)
 
 ---
 
 ## 技术栈
 
-| 层级 | 技术 | 版本 |
-|------|------|------|
-| 前端框架 | Vue 3（Composition API + `<script setup>`） | ^3.5.25 |
-| 构建工具 | Vite | ^7.3.1 |
-| 3D 引擎 | Cesium | ^1.141.0 |
-| 类型检查 | TypeScript + vue-tsc | ~5.9.3 |
-| UI 组件库 | Element Plus（按需导入） | ^2.14.0 |
-| 路由 | Vue Router | ^5.1.0 |
-| 地理空间计算 | Turf.js | ^7.3.5 |
-| Excel 处理 | SheetJS (xlsx) | ^0.18.5 |
-| 后端框架 | Express | ^4.22.2 |
-| 数据库 | PostgreSQL (pg) | ^8.16.0 |
+| 层级         | 技术                                         | 版本     |
+| ------------ | -------------------------------------------- | -------- |
+| 前端框架     | Vue 3（Composition API +`<script setup>`） | ^3.5.25  |
+| 构建工具     | Vite                                         | ^7.3.1   |
+| 3D 引擎      | Cesium                                       | ^1.141.0 |
+| 类型检查     | TypeScript + vue-tsc                         | ~5.9.3   |
+| UI 组件库    | Element Plus（按需导入）                     | ^2.14.0  |
+| 路由         | Vue Router                                   | ^5.1.0   |
+| 地理空间计算 | Turf.js                                      | ^7.3.5   |
+| Excel 处理   | SheetJS (xlsx)                               | ^0.18.5  |
+| 后端框架     | Express                                      | ^4.22.2  |
+| 数据库       | PostgreSQL (pg)                              | ^8.16.0  |
 
 ---
 
@@ -190,11 +199,13 @@ npm run dev
 ```
 
 **没有 Token 的影响：**
+
 - 火星探索模块：无法加载火星地形
 - 城市漫游模块：无法加载 Google 3D Tiles
 - 空间分析模块：无法加载地形数据，影响可视域分析精度
 
 **Token 获取步骤截图说明：**
+
 1. 登录 Cesium Ion → 进入 Dashboard
 2. 点击 "Create Token" 按钮
 3. 选择 Token 类型为 "Default"（免费）
@@ -240,12 +251,12 @@ npm run preview
 
 ## 可用命令
 
-| 命令 | 说明 |
-|------|------|
-| `npm run dev` | 启动 Vite 前端开发服务器 |
-| `npm run build` | TypeScript 类型检查 + 生产构建 |
-| `npm run preview` | 预览生产构建产物 |
-| `npm run server` | 启动 Express 后端 API 服务 |
+| 命令                | 说明                           |
+| ------------------- | ------------------------------ |
+| `npm run dev`     | 启动 Vite 前端开发服务器       |
+| `npm run build`   | TypeScript 类型检查 + 生产构建 |
+| `npm run preview` | 预览生产构建产物               |
+| `npm run server`  | 启动 Express 后端 API 服务     |
 
 ---
 
@@ -255,26 +266,26 @@ npm run preview
 
 ### 课程管理 API
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/courses` | 获取所有课程（支持 `weekday`、`buildingName` 查询参数） |
-| GET | `/api/courses/today` | 获取今日课程 |
-| GET | `/api/courses/week/:weekNumber` | 获取指定周次课程 |
-| GET | `/api/courses/building/:buildingName` | 获取指定建筑的课程 |
-| POST | `/api/courses` | 新增课程 |
-| PUT | `/api/courses/:id` | 更新课程 |
-| DELETE | `/api/courses/:id` | 删除课程 |
-| POST | `/api/courses/import` | 批量导入课程 |
+| 方法   | 路径                                    | 说明                                                        |
+| ------ | --------------------------------------- | ----------------------------------------------------------- |
+| GET    | `/api/courses`                        | 获取所有课程（支持 `weekday`、`buildingName` 查询参数） |
+| GET    | `/api/courses/today`                  | 获取今日课程                                                |
+| GET    | `/api/courses/week/:weekNumber`       | 获取指定周次课程                                            |
+| GET    | `/api/courses/building/:buildingName` | 获取指定建筑的课程                                          |
+| POST   | `/api/courses`                        | 新增课程                                                    |
+| PUT    | `/api/courses/:id`                    | 更新课程                                                    |
+| DELETE | `/api/courses/:id`                    | 删除课程                                                    |
+| POST   | `/api/courses/import`                 | 批量导入课程                                                |
 
 ### GeoJSON 图层 API
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/geojson-layers` | 获取所有图层元数据 |
-| GET | `/api/geojson-layers/:id` | 获取单个图层（含完整 GeoJSON） |
-| POST | `/api/geojson-layers` | 创建新图层（自动分组） |
-| PUT | `/api/geojson-layers/:id` | 更新图层 |
-| DELETE | `/api/geojson-layers/:id` | 删除图层 |
+| 方法   | 路径                        | 说明                           |
+| ------ | --------------------------- | ------------------------------ |
+| GET    | `/api/geojson-layers`     | 获取所有图层元数据             |
+| GET    | `/api/geojson-layers/:id` | 获取单个图层（含完整 GeoJSON） |
+| POST   | `/api/geojson-layers`     | 创建新图层（自动分组）         |
+| PUT    | `/api/geojson-layers/:id` | 更新图层                       |
+| DELETE | `/api/geojson-layers/:id` | 删除图层                       |
 
 ---
 
@@ -282,20 +293,20 @@ npm run preview
 
 ### 示例 GeoJSON 文件
 
-| 文件 | 说明 | 特点 |
-|------|------|------|
-| `FUYANG_Building.geojson` | 阜阳市城市建筑 | 约 62MB，大规模建筑底面 |
+| 文件                         | 说明                 | 特点                               |
+| ---------------------------- | -------------------- | ---------------------------------- |
+| `FUYANG_Building.geojson`  | 阜阳市城市建筑       | 约 62MB，大规模建筑底面            |
 | `fynu_xihu_campus.geojson` | 阜阳师范大学西湖校区 | 校园级建筑数据，含 `Height` 属性 |
-| `planet_*.osm.geojson` | OSM 区域导出 | 街区级地理数据 |
-| `test_buildings.geojson` | 测试用建筑数据 | 小规模，适合快速调试 |
+| `planet_*.osm.geojson`     | OSM 区域导出         | 街区级地理数据                     |
+| `test_buildings.geojson`   | 测试用建筑数据       | 小规模，适合快速调试               |
 
 ### 火星静态资源
 
-| 文件 | 说明 |
-|------|------|
-| `public/data/mars/Mars.czml` | 火星车行驶路线（CZML 格式） |
-| `public/data/mars/MarsPointsOfInterest.geojson` | 火星地标点位 |
-| `public/data/mars/models/` | 3D 模型文件目录 |
+| 文件                                              | 说明                        |
+| ------------------------------------------------- | --------------------------- |
+| `public/data/mars/Mars.czml`                    | 火星车行驶路线（CZML 格式） |
+| `public/data/mars/MarsPointsOfInterest.geojson` | 火星地标点位                |
+| `public/data/mars/models/`                      | 3D 模型文件目录             |
 
 ---
 
@@ -313,11 +324,11 @@ npm run preview
 
 项目使用 Vite 环境变量配置，在根目录 `.env` 文件中设置：
 
-| 变量名 | 必须 | 说明 |
-|--------|------|------|
+| 变量名                | 必须    | 说明                                                      |
+| --------------------- | ------- | --------------------------------------------------------- |
 | `VITE_CESIUM_TOKEN` | ✅ 必须 | Cesium Ion Access Token，用于加载 3D 地球、地形、建筑数据 |
-| `DATABASE_URL` | ❌ 可选 | PostgreSQL 连接字符串（课程管理功能需要） |
-| `PORT` | ❌ 可选 | 后端 API 服务端口（默认 9999） |
+| `DATABASE_URL`      | ❌ 可选 | PostgreSQL 连接字符串（课程管理功能需要）                 |
+| `PORT`              | ❌ 可选 | 后端 API 服务端口（默认 9999）                            |
 
 ### Cesium Ion Token
 
@@ -325,6 +336,7 @@ npm run preview
 Cesium Ion Token 是 Cesium 平台的访问凭证，用于授权访问其托管的 3D 地球数据、地形服务和建筑模型。
 
 **为什么需要 Token？**
+
 - 加载全球地形数据（Cesium World Terrain）
 - 加载火星地形模型（Mars Terrain）
 - 加载 Google Photorealistic 3D Tiles
@@ -338,11 +350,13 @@ VITE_CESIUM_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxxx
 ```
 
 **Token 用量说明：**
+
 - **免费额度**：每月 100,000 次 API 调用
 - **个人学习**：完全足够
 - **生产环境**：建议升级到付费计划
 
 **Token 安全提示：**
+
 - ⚠️ 不要将 Token 提交到 Git 仓库（已在 .gitignore 中排除）
 - ⚠️ 不要在公共代码仓库中分享 Token
 - ✅ 建议定期轮换 Token
